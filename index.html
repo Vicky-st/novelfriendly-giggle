@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界名著人物关系梳理工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        /* 首页样式 */
+        .home-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .home-page h1 {
+            font-size: 36px;
+            color: #f5c518;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(245, 197, 24, 0.3);
+        }
+        .home-page .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 40px;
+        }
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 40px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #f5c518;
+            box-shadow: 0 0 20px rgba(245, 197, 24, 0.2);
+        }
+        .search-box input::placeholder {
+            color: #666;
+        }
+        .recommend-title {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+        .book-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .book-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #f5c518;
+            transform: translateY(-5px);
+        }
+        .book-card .book-name {
+            font-size: 18px;
+            color: #f5c518;
+            margin-bottom: 8px;
+        }
+        .book-card .book-author {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        /* 详情页样式 */
+        .detail-page {
+            display: none;
+            min-height: 100vh;
+        }
+        .detail-page.active {
+            display: block;
+        }
+        .detail-header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .detail-header h1 {
+            font-size: 28px;
+            color: #f5c518;
+        }
+        .detail-header .author {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        /* Tab 导航 */
+        .tab-nav {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 15px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+        .tab-btn.active {
+            color: #f5c518;
+            border-bottom-color: #f5c518;
+        }
+        
+        /* Tab 内容 */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 人物关系图 */
+        .graph-container {
+            display: flex;
+            gap: 20px;
+        }
+        .graph-area {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            overflow: auto;
+        }
+        .info-panel {
+            width: 340px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .info-panel .placeholder {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 40px 0;
+        }
+        .char-detail { display: none; }
+        .char-detail.active { display: block; }
+        .char-detail .name { font-size: 22px; color: #f5c518; margin-bottom: 5px; }
+        .char-detail .gen { font-size: 12px; color: #888; margin-bottom: 15px; }
+        .char-detail .desc { font-size: 14px; line-height: 1.6; margin-bottom: 15px; }
+        .char-detail .relations { font-size: 13px; }
+        .char-detail .relations h4 { color: #4a9eff; margin: 10px 0 5px; }
+        .char-detail .relations li { margin-left: 15px; margin-bottom: 3px; color: #ccc; }
+        
+        /* 图例 */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        .legend-line {
+            width: 30px;
+            height: 3px;
+        }
+        .legend-line.parent { background: #4a9eff; }
+        .legend-line.sibling { background: #4a9eff; background: repeating-linear-gradient(90deg, #4a9eff 0, #4a9eff 5px, transparent 5px, transparent 8px); }
+        .legend-line.marriage { background: #ff6b6b; }
+        .legend-line.love { background: #ff6b6b; background: repeating-linear-gradient(90deg, #ff6b6b 0, #ff6b6b 3px, transparent 3px, transparent 6px); }
+        .legend-line.friend { background: #888; background: repeating-linear-gradient(90deg, #888 0, #888 4px, transparent 4px, transparent 8px); }
+        
+        /* 概要样式 */
+        .summary-content {
+            max-width: 800px;
+        }
+        .summary-content h2 {
+            color: #f5c518;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        .summary-content h3 {
+            color: #4a9eff;
+            margin: 20px 0 10px;
+            font-size: 18px;
+        }
+        .summary-content p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        .summary-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .summary-content li {
+            line-height: 1.8;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        
+        /* 章节梗概 */
+        .chapter-list {
+            display: grid;
+            gap: 15px;
+        }
+        .chapter-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .chapter-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .chapter-item.expanded {
+            background: rgba(255,255,255,0.08);
+        }
+        .chapter-title {
+            font-size: 16px;
+            color: #f5c518;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chapter-title .toggle {
+            font-size: 20px;
+            color: #888;
+            transition: transform 0.3s;
+        }
+        .chapter-item.expanded .toggle {
+            transform: rotate(180deg);
+        }
+        .chapter-summary {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.8;
+            color: #ccc;
+        }
+        .chapter-item.expanded .chapter-summary {
+            display: block;
+        }
+        
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #f5c518, #4a9eff);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 25px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #f5c518;
+            border: 3px solid #1a1a2e;
+        }
+        .timeline-item .time {
+            font-size: 12px;
+            color: #f5c518;
+            margin-bottom: 8px;
+        }
+        .timeline-item .event {
+            font-size: 15px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .timeline-item .desc {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+        
+        /* 经典场景 */
+        .scene-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .scene-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .scene-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-3px);
+        }
+        .scene-card .scene-title {
+            font-size: 16px;
+            color: #f5c518;
+            margin-bottom: 10px;
+        }
+        .scene-card .scene-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+        
+        /* SVG 样式 */
+        svg { display: block; margin: 0 auto; }
+        .node { cursor: pointer; }
+        .node circle {
+            stroke: #fff;
+            stroke-width: 2;
+            transition: all 0.3s;
+        }
+        .node:hover circle { stroke-width: 3; filter: brightness(1.3); }
+        .node.highlighted circle { stroke: #f5c518; stroke-width: 4; filter: drop-shadow(0 0 10px rgba(245,197,24,0.5)); }
+        .node text {
+            fill: #e0e0e0;
+            font-size: 11px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        .link {
+            fill: none;
+            stroke-width: 2;
+            transition: all 0.3s;
+        }
+        .link.parent { stroke: #4a9eff; }
+        .link.sibling { stroke: #4a9eff; stroke-dasharray: 5,3; }
+        .link.marriage { stroke: #ff6b6b; }
+        .link.love { stroke: #ff6b6b; stroke-dasharray: 3,3; }
+        .link.friend { stroke: #888; stroke-dasharray: 4,4; }
+        .link.dimmed { opacity: 0.15; }
+        .node.dimmed { opacity: 0.2; }
+        .link.highlighted { stroke-width: 3; filter: drop-shadow(0 0 5px currentColor); }
+        
+        @media (max-width: 1100px) {
+            .graph-container { flex-direction: column; }
+            .info-panel { width: 100%; max-height: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 首页 -->
+    <div class="home-page" id="homePage">
+        <h1>📚 世界名著导读</h1>
+        <p class="subtitle">人物关系 · 故事概要 · 章节梗概 · 关键时间线</p>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="输入小说名称搜索..." autocomplete="off">
+        </div>
+        
+        <p class="recommend-title">📖 热门推荐</p>
+        <div class="book-grid" id="bookGrid">
+            <div class="book-card" data-book="百年孤独">
+                <div class="book-name">百年孤独</div>
+                <div class="book-author">加西亚·马尔克斯</div>
+            </div>
+            <div class="book-card" data-book="飘">
+                <div class="book-name">飘</div>
+                <div class="book-author">玛格丽特·米切尔</div>
+            </div>
+            <div class="book-card" data-book="简爱">
+                <div class="book-name">简爱</div>
+                <div class="book-author">夏洛蒂·勃朗特</div>
+            </div>
+            <div class="book-card" data-book="茶花女">
+                <div class="book-name">茶花女</div>
+                <div class="book-author">小仲马</div>
+            </div>
+            <div class="book-card" data-book="红楼梦">
+                <div class="book-name">红楼梦</div>
+                <div class="book-author">曹雪芹</div>
+            </div>
+            <div class="book-card" data-book="战争与和平">
+                <div class="book-name">战争与和平</div>
+                <div class="book-author">列夫·托尔斯泰</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 详情页 -->
+    <div class="detail-page" id="detailPage">
+        <div class="detail-header">
+            <button class="back-btn" onclick="goHome()">← 返回</button>
+            <div>
+                <h1 id="bookTitle">百年孤独</h1>
+                <span class="author" id="bookAuthor">加西亚·马尔克斯</span>
+            </div>
+        </div>
+        
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="relationship">人物关系</button>
+            <button class="tab-btn" data-tab="summary">小说概要</button>
+            <button class="tab-btn" data-tab="chapters">章节梗概</button>
+            <button class="tab-btn" data-tab="timeline">关键时间线</button>
+            <button class="tab-btn" data-tab="scenes">经典场景</button>
+            <button class="tab-btn" data-tab="characters">人物详情</button>
+        </div>
+        
+        <!-- 人物关系 Tab -->
+        <div class="tab-content active" id="tab-relationship">
+            <div class="legend">
+                <div class="legend-item"><div class="legend-line parent"></div><span>父母→子女</span></div>
+                <div class="legend-item"><div class="legend-line sibling"></div><span>手足/同胞</span></div>
+                <div class="legend-item"><div class="legend-line marriage"></div><span>婚姻</span></div>
+                <div class="legend-item"><div class="legend-line love"></div><span>爱情/情人</span></div>
+                <div class="legend-item"><div class="legend-line friend"></div><span>朋友</span></div>
+            </div>
+            <div class="graph-container">
+                <div class="graph-area">
+                    <svg id="graph" width="1200" height="900"></svg>
+                </div>
+                <div class="info-panel" id="infoPanel">
+                    <p class="placeholder" id="placeholder">点击人物节点查看详情</p>
+                    <div class="char-detail" id="charDetail"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 小说概要 Tab -->
+        <div class="tab-content" id="tab-summary">
+            <div class="summary-content" id="summaryContent"></div>
+        </div>
+        
+        <!-- 章节梗概 Tab -->
+        <div class="tab-content" id="tab-chapters">
+            <div class="chapter-list" id="chapterList"></div>
+        </div>
+        
+        <!-- 关键时间线 Tab -->
+        <div class="tab-content" id="tab-timeline">
+            <div class="timeline" id="timelineContent"></div>
+        </div>
+        
+        <!-- 经典场景 Tab -->
+        <div class="tab-content" id="tab-scenes">
+            <div class="scene-grid" id="sceneGrid"></div>
+        </div>
+        
+        <!-- 人物详情 Tab -->
+        <div class="tab-content" id="tab-characters">
+            <div class="chapter-list" id="characterList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 小说数据
+        const booksData = {
+            '百年孤独': {
+                author: '加西亚·马尔克斯',
+                summary: {
+                    intro: '《百年孤独》是哥伦比亚作家加西亚·马尔克斯的代表作，也是拉丁美洲魔幻现实主义文学的代表作。被誉为"再现拉丁美洲历史社会图景的鸿篇巨著"。',
+                    theme: '作品描写了布恩迪亚家族七代人的传奇故事，以及加勒比海沿岸小镇马孔多的百年兴衰，反映了拉丁美洲一个世纪以来风云变幻的历史。作品融入神话传说、民间故事、宗教典故等神秘因素，巧妙地糅合了现实与虚幻，展现出一个瑰丽的想象世界。',
+                    background: '小说以作者童年时代的外祖父家为原型，融合了哥伦比亚乃至拉丁美洲的历史事件：千日战争、香蕉公司、大屠杀、连绵四年的大雨等。',
+                    significance: '1982年，马尔克斯凭借此作获得诺贝尔文学奖。评委称其"把幻想与现实融为一体，勾画出一个丰富多彩的想象中的世界，反映了拉丁美洲大陆的生活和斗争"。'
+                },
+                chapters: [
+                    { title: '第一章：马孔多的建立', summary: '何塞·阿尔卡蒂奥·布恩迪亚和乌尔苏拉这对表兄妹结婚后，因害怕生出长猪尾巴的孩子而离开故乡，带领一群人穿越沼泽，建立了马孔多村。吉普赛人梅尔基亚德斯带来了磁铁、放大镜等"发明"，激发了何塞对炼金术的痴迷。' },
+                    { title: '第二章：家族的繁衍', summary: '布恩迪亚家族开始繁衍。长子何塞·阿尔卡蒂奥身材巨大，次子奥雷里亚诺（后来的上校）性格内向。乌尔苏拉通过制作小动物糖果生意兴隆。何塞因痴迷炼金术逐渐疯癫，被绑在栗树下。' },
+                    { title: '第三章：内战与上校', summary: '自由派与保守派的内战爆发。奥雷里亚诺·布恩迪亚上校发动32场起义，全部失败。他与多个女人生了17个儿子，最终厌倦战争，回到马孔多制作小金鱼。' },
+                    { title: '第四章：香蕉公司', summary: '美国香蕉公司进入马孔多，带来繁荣也带来剥削。工人们举行罢工，政府军队在火车站屠杀3000多人，尸体被运走扔进大海。官方却宣称"没有人死亡"。何塞·阿尔卡蒂奥第二是唯一幸存者。' },
+                    { title: '第五章：连绵大雨', summary: '大屠杀后，马孔多下了四年十一个月零两天的雨。布恩迪亚家族开始衰败。奥雷里亚诺第二与情妇佩特拉的牲畜疯狂繁殖，但雨停后一切化为乌有。' },
+                    { title: '第六章：最后的布恩迪亚', summary: '奥雷里亚诺·巴比伦破译了梅尔基亚德斯的羊皮卷，发现上面记载着家族的全部命运。他与姨母阿玛兰妲·乌尔苏拉相爱，生下最后一个布恩迪亚——长着猪尾巴的婴儿。婴儿被蚂蚁吃掉，马孔多被飓风抹去。' }
+                ],
+                timeline: [
+                    { time: '建村初期', event: '马孔多建立', desc: '何塞·阿尔卡蒂奥·布恩迪亚带领众人建立马孔多村，吉普赛人梅尔基亚德斯带来炼金术。' },
+                    { time: '建村20年后', event: '何塞发疯', desc: '何塞·阿尔卡蒂奥·布恩迪亚因痴迷炼金术逐渐疯癫，被绑在栗树下，只有乌尔苏拉能与他沟通。' },
+                    { time: '内战时期', event: '奥雷里亚诺上校起义', desc: '奥雷里亚诺·布恩迪亚上校发动32场起义，全部失败，最终签订停战协议。' },
+                    { time: '1900年代', event: '香蕉公司进入', desc: '美国香蕉公司进入马孔多，带来铁路和繁荣，也带来剥削和压迫。' },
+                    { time: '1928年', event: '大屠杀', desc: '香蕉工人罢工，政府在火车站屠杀3000多人，尸体被运走扔进大海。' },
+                    { time: '大屠杀后', event: '四年大雨', desc: '马孔多下了四年十一个月零两天的雨，家族开始衰败。' },
+                    { time: '末期', event: '家族终结', desc: '最后一个布恩迪亚（猪尾巴婴儿）被蚂蚁吃掉，马孔多被飓风抹去。' }
+                ],
+                scenes: [
+                    { title: '冰块', desc: '开篇名句："多年以后，面对行刑队，奥雷里亚诺·布恩迪亚上校将会回想起父亲带他去见识冰块的那个遥远的下午。"这是上校童年最神奇的经历。' },
+                    { title: '小金鱼', desc: '奥雷里亚诺上校晚年反复制作小金鱼，做完25条就融化重做。这象征着他无尽的孤独和时间的循环。' },
+                    { title: '黄蝴蝶', desc: '马乌里西奥·巴比伦身边总是围绕着黄蝴蝶。当他被射伤致残后，黄蝴蝶也消失了。' },
+                    { title: '升天', desc: '美人儿蕾梅黛丝美得惊人，最终裹着床单飞升上天。她是唯一一个活着离开人世的布恩迪亚。' },
+                    { title: '羊皮卷', desc: '梅尔基亚德斯留下的羊皮卷，记载着家族的全部命运。奥雷里亚诺·巴比伦破译时，马孔多被飓风抹去。' },
+                    { title: '猪尾巴', desc: '家族诅咒：近亲通婚会生出长猪尾巴的孩子。最后一个布恩迪亚真的长着猪尾巴，被蚂蚁吃掉。' }
+                ],
+                characters: [
+                    { id: 'jab', name: '何塞·阿尔卡蒂奥·布恩迪亚', gen: 1, x: 450, y: 60, color: '#e74c3c', desc: '马孔多创建者，家族第一代族长。痴迷炼金术和吉普赛人的发明，晚年发疯被绑在栗树下。', relations: [{type:'婚姻',target:'乌尔苏拉'},{type:'创办',target:'马孔多'}] },
+                    { id: 'ursula', name: '乌尔苏拉', gen: 1, x: 650, y: 60, color: '#e67e22', desc: '家族女族长，活了100多岁。是家族的精神支柱，维系着整个布恩迪亚家族。', relations: [{type:'婚姻',target:'何塞·阿尔卡蒂奥·布恩迪亚'},{type:'母亲',target:'何塞·阿尔卡蒂奥/奥雷里亚诺上校/阿玛兰妲'}] },
+                    { id: 'melq', name: '梅尔基亚德斯', gen: 0, x: 1050, y: 60, color: '#607d8b', desc: '吉普赛人，将炼金术和磁铁等带给马孔多。写下预言家族命运的羊皮卷。', relations: [{type:'朋友',target:'何塞·阿尔卡蒂奥·布恩迪亚'}] },
+                    { id: 'ja', name: '何塞·阿尔卡蒂奥', gen: 2, x: 150, y: 200, color: '#e74c3c', desc: '长子，身材巨大，性格粗暴。与吉普赛人私奔后归来，娶了养女丽贝卡。', relations: [{type:'父母',target:'何塞·阿尔卡蒂奥·布恩迪亚 & 乌尔苏拉'},{type:'手足',target:'奥雷里亚诺上校/阿玛兰妲'},{type:'婚姻',target:'丽贝卡'},{type:'情人',target:'皮拉尔·特尔内斯'}] },
+                    { id: 'reb', name: '丽贝卡', gen: 2, x: 300, y: 200, color: '#e67e22', desc: '养女，有吃土和吃墙皮的怪癖。与阿玛兰妲争夺钢琴师皮埃特罗·克雷斯皮失败，后嫁给何塞·阿尔卡蒂奥。', relations: [{type:'养父母',target:'何塞·阿尔卡蒂奥·布恩迪亚 & 乌尔苏拉'},{type:'婚姻',target:'何塞·阿尔卡蒂奥'},{type:'情敌',target:'阿玛兰妲'}] },
+                    { id: 'col', name: '奥雷里亚诺上校', gen: 2, x: 450, y: 200, color: '#3498db', desc: '发动32场起义均失败。晚年反复制作小金鱼，在栗树下小便时死去。', relations: [{type:'父母',target:'何塞·阿尔卡蒂奥·布恩迪亚 & 乌尔苏拉'},{type:'手足',target:'何塞·阿尔卡蒂奥/阿玛兰妲'},{type:'婚姻',target:'蕾梅黛丝（早逝）'},{type:'情人',target:'皮拉尔·特尔内斯'}] },
+                    { id: 'remedios', name: '蕾梅黛丝·莫斯科特', gen: 2, x: 600, y: 200, color: '#ffeb3b', desc: '奥雷里亚诺上校的妻子，莫科特镇长的女儿。嫁给上校时年仅9岁，后因怀孕并发症早逝。', relations: [{type:'婚姻',target:'奥雷里亚诺上校'}] },
+                    { id: 'ama', name: '阿玛兰妲', gen: 2, x: 750, y: 200, color: '#9b59b6', desc: '终生未嫁。与丽贝卡争夺钢琴师皮埃特罗·克雷斯皮，晚年织了又拆自己的寿衣，预知死亡日期。', relations: [{type:'父母',target:'何塞·阿尔卡蒂奥·布恩迪亚 & 乌尔苏拉'},{type:'手足',target:'何塞·阿尔卡蒂奥/奥雷里亚诺上校'},{type:'情敌',target:'丽贝卡'}] },
+                    { id: 'pietro', name: '皮埃特罗·克雷斯皮', gen: 2, x: 900, y: 200, color: '#00bcd4', desc: '意大利钢琴师，教丽贝卡和阿玛兰妲弹钢琴。丽贝卡和阿玛兰妲都爱上了他。', relations: [{type:'恋人',target:'丽贝卡'},{type:'追求者',target:'阿玛兰妲'}] },
+                    { id: 'pilar', name: '皮拉尔·特尔内斯', gen: 2, x: 300, y: 280, color: '#795548', desc: '纸牌算命女人。与何塞·阿尔卡蒂奥和奥雷里亚诺上校都生有后代。', relations: [{type:'情人',target:'何塞·阿尔卡蒂奥'},{type:'情人',target:'奥雷里亚诺上校'}] },
+                    { id: 'arc', name: '阿尔卡蒂奥', gen: 3, x: 300, y: 380, color: '#e74c3c', desc: '何塞·阿尔卡蒂奥与皮拉尔·特尔内斯的私生子。担任马孔多首领，被保守派枪决。', relations: [{type:'父母',target:'何塞·阿尔卡蒂奥 & 皮拉尔'},{type:'婚姻',target:'索菲亚·德拉·佩德'}] },
+                    { id: 'sophia', name: '索菲亚·德拉·佩德', gen: 3, x: 500, y: 380, color: '#e91e63', desc: '阿尔卡蒂奥的妻子。生下奥雷里亚诺第二、何塞·阿尔卡蒂奥第二和美人儿蕾梅黛丝。', relations: [{type:'婚姻',target:'阿尔卡蒂奥'},{type:'母亲',target:'奥雷里亚诺第二/何塞·阿尔卡蒂奥第二/美人儿蕾梅黛丝'}] },
+                    { id: 'auj', name: '奥雷里亚诺·何塞', gen: 3, x: 700, y: 380, color: '#3498db', desc: '奥雷里亚诺上校与皮拉尔·特尔内斯的私生子。爱上姑妈阿玛兰妲，在政变中被杀。', relations: [{type:'父母',target:'奥雷里亚诺上校 & 皮拉尔'},{type:'暗恋',target:'阿玛兰妲（姑妈）'}] },
+                    { id: 'ja2', name: '奥雷里亚诺第二', gen: 4, x: 200, y: 540, color: '#2ecc71', desc: '双胞胎中的哥哥。与情妇佩特拉挥霍无度，后又回归家庭。', relations: [{type:'父母',target:'阿尔卡蒂奥 & 索菲亚'},{type:'手足',target:'何塞·阿尔卡蒂奥第二/美人儿蕾梅黛丝'},{type:'婚姻',target:'费尔南达'},{type:'情人',target:'佩特拉·科特斯'}] },
+                    { id: 'fernanda', name: '费尔南达', gen: 4, x: 400, y: 540, color: '#673ab7', desc: '奥雷里亚诺第二的妻子，出身贵族。生下何塞·阿尔卡蒂奥、蕾纳塔·蕾梅黛丝（梅梅）和阿玛兰妲·乌尔苏拉。', relations: [{type:'婚姻',target:'奥雷里亚诺第二'},{type:'母亲',target:'何塞·阿尔卡蒂奥/蕾纳塔·蕾梅黛丝/阿玛兰妲·乌尔苏拉'}] },
+                    { id: 'ja2b', name: '何塞·阿尔卡蒂奥第二', gen: 4, x: 600, y: 540, color: '#2ecc71', desc: '双胞胎中的弟弟。香蕉公司大屠杀的唯一成年幸存者，晚年研究羊皮卷。', relations: [{type:'父母',target:'阿尔卡蒂奥 & 索菲亚'},{type:'手足',target:'奥雷里亚诺第二/美人儿蕾梅黛丝'}] },
+                    { id: 'remedios_b', name: '美人儿蕾梅黛丝', gen: 4, x: 800, y: 540, color: '#ff9800', desc: '阿尔卡蒂奥与索菲亚之女。美得惊人，最终裹着床单飞升上天。', relations: [{type:'父母',target:'阿尔卡蒂奥 & 索菲亚'},{type:'手足',target:'奥雷里亚诺第二/何塞·阿尔卡蒂奥第二'}] },
+                    { id: 'petra', name: '佩特拉·科特斯', gen: 4, x: 300, y: 620, color: '#ff9800', desc: '奥雷里亚诺第二的情妇。她的存在能让牲畜疯狂繁殖。', relations: [{type:'情人',target:'奥雷里亚诺第二'}] },
+                    { id: 'ja3', name: '何塞·阿尔卡蒂奥（神学院）', gen: 5, x: 200, y: 700, color: '#e74c3c', desc: '奥雷里亚诺第二与费尔南达之子，被送去罗马学神学。回家后发现宝藏，后被杀。', relations: [{type:'父母',target:'奥雷里亚诺第二 & 费尔南达'},{type:'手足',target:'蕾纳塔·蕾梅黛丝/阿玛兰妲·乌尔苏拉'}] },
+                    { id: 'meme', name: '蕾纳塔·蕾梅黛丝（梅梅）', gen: 5, x: 400, y: 700, color: '#e91e63', desc: '奥雷里亚诺第二与费尔南达之女。与马乌里西奥·巴比伦相爱，被送进修道院，终生沉默。', relations: [{type:'父母',target:'奥雷里亚诺第二 & 费尔南达'},{type:'手足',target:'何塞·阿尔卡蒂奥/阿玛兰妲·乌尔苏拉'},{type:'恋人',target:'马乌里西奥·巴比伦'}] },
+                    { id: 'aus', name: '阿玛兰妲·乌尔苏拉', gen: 5, x: 600, y: 700, color: '#9b59b6', desc: '奥雷里亚诺第二与费尔南达之女，活力充沛。从欧洲归来试图振兴马孔多，最终因失血而死。', relations: [{type:'父母',target:'奥雷里亚诺第二 & 费尔南达'},{type:'手足',target:'何塞·阿尔卡蒂奥/蕾纳塔·蕾梅黛丝'},{type:'恋人',target:'奥雷里亚诺·巴比伦'}] },
+                    { id: 'mauricio', name: '马乌里西奥·巴比伦', gen: 5, x: 400, y: 780, color: '#00bcd4', desc: '梅梅的恋人，机械师学徒。被费尔南达派人射伤致残，梅梅因此终生沉默。', relations: [{type:'恋人',target:'蕾纳塔·蕾梅黛丝'}] },
+                    { id: 'ob', name: '奥雷里亚诺·巴比伦', gen: 5, x: 550, y: 780, color: '#3498db', desc: '梅梅与马乌里西奥·巴比伦之子。破译了梅尔基亚德斯的羊皮卷。', relations: [{type:'父母',target:'蕾纳塔·蕾梅黛丝 & 马乌里西奥·巴比伦'},{type:'恋人',target:'阿玛兰妲·乌尔苏拉'}] },
+                    { id: 'last', name: '奥雷里亚诺（猪尾巴）', gen: 6, x: 550, y: 850, color: '#ff5722', desc: '奥雷里亚诺·巴比伦与阿玛兰妲·乌尔苏拉之子。生来带有猪尾巴，被蚂蚁吃掉。', relations: [{type:'父母',target:'奥雷里亚诺·巴比伦 & 阿玛兰妲·乌尔苏拉'}] },
+                ],
+                links: [
+                    { source: 'jab', target: 'ursula', type: 'marriage' },
+                    { source: 'jab', target: 'ja', type: 'parent' },
+                    { source: 'ursula', target: 'ja', type: 'parent' },
+                    { source: 'jab', target: 'col', type: 'parent' },
+                    { source: 'ursula', target: 'col', type: 'parent' },
+                    { source: 'jab', target: 'ama', type: 'parent' },
+                    { source: 'ursula', target: 'ama', type: 'parent' },
+                    { source: 'ursula', target: 'reb', type: 'parent' },
+                    { source: 'ja', target: 'col', type: 'sibling' },
+                    { source: 'col', target: 'ama', type: 'sibling' },
+                    { source: 'ja', target: 'reb', type: 'marriage' },
+                    { source: 'col', target: 'remedios', type: 'marriage' },
+                    { source: 'ja', target: 'pilar', type: 'love' },
+                    { source: 'col', target: 'pilar', type: 'love' },
+                    { source: 'pietro', target: 'reb', type: 'love' },
+                    { source: 'pietro', target: 'ama', type: 'love' },
+                    { source: 'ja', target: 'arc', type: 'parent' },
+                    { source: 'pilar', target: 'arc', type: 'parent' },
+                    { source: 'col', target: 'auj', type: 'parent' },
+                    { source: 'pilar', target: 'auj', type: 'parent' },
+                    { source: 'arc', target: 'auj', type: 'sibling' },
+                    { source: 'arc', target: 'sophia', type: 'marriage' },
+                    { source: 'arc', target: 'ja2', type: 'parent' },
+                    { source: 'sophia', target: 'ja2', type: 'parent' },
+                    { source: 'arc', target: 'ja2b', type: 'parent' },
+                    { source: 'sophia', target: 'ja2b', type: 'parent' },
+                    { source: 'arc', target: 'remedios_b', type: 'parent' },
+                    { source: 'sophia', target: 'remedios_b', type: 'parent' },
+                    { source: 'ja2', target: 'ja2b', type: 'sibling' },
+                    { source: 'ja2', target: 'remedios_b', type: 'sibling' },
+                    { source: 'ja2b', target: 'remedios_b', type: 'sibling' },
+                    { source: 'ja2', target: 'fernanda', type: 'marriage' },
+                    { source: 'ja2', target: 'petra', type: 'love' },
+                    { source: 'ja2', target: 'ja3', type: 'parent' },
+                    { source: 'fernanda', target: 'ja3', type: 'parent' },
+                    { source: 'ja2', target: 'meme', type: 'parent' },
+                    { source: 'fernanda', target: 'meme', type: 'parent' },
+                    { source: 'ja2', target: 'aus', type: 'parent' },
+                    { source: 'fernanda', target: 'aus', type: 'parent' },
+                    { source: 'ja3', target: 'meme', type: 'sibling' },
+                    { source: 'ja3', target: 'aus', type: 'sibling' },
+                    { source: 'meme', target: 'aus', type: 'sibling' },
+                    { source: 'meme', target: 'mauricio', type: 'love' },
+                    { source: 'ob', target: 'aus', type: 'love' },
+                    { source: 'meme', target: 'ob', type: 'parent' },
+                    { source: 'mauricio', target: 'ob', type: 'parent' },
+                    { source: 'ob', target: 'last', type: 'parent' },
+                    { source: 'aus', target: 'last', type: 'parent' },
+                    { source: 'melq', target: 'jab', type: 'friend' },
+                ]
+            }
+        };
+        
+        let currentBook = null;
+        
+        // 首页交互
+        document.querySelectorAll('.book-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const bookName = card.dataset.book;
+                if (booksData[bookName]) {
+                    openBook(bookName);
+                } else {
+                    alert(`《${bookName}》的数据正在准备中，敬请期待！`);
+                }
+            });
+        });
+        
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (booksData[query]) {
+                    openBook(query);
+                } else {
+                    alert(`未找到《${query}》，请从推荐列表中选择。`);
+                }
+            }
+        });
+        
+        function openBook(bookName) {
+            currentBook = bookName;
+            const book = booksData[bookName];
+            
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('detailPage').classList.add('active');
+            document.getElementById('bookTitle').textContent = bookName;
+            document.getElementById('bookAuthor').textContent = book.author;
+            
+            renderSummary(book.summary);
+            renderChapters(book.chapters);
+            renderTimeline(book.timeline);
+            renderScenes(book.scenes);
+            renderCharacters(book.characters);
+            renderGraph(book.characters, book.links);
+        }
+        
+        function goHome() {
+            document.getElementById('homePage').style.display = 'flex';
+            document.getElementById('detailPage').classList.remove('active');
+        }
+        
+        // Tab 切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+        
+        function renderSummary(summary) {
+            document.getElementById('summaryContent').innerHTML = `
+                <h2>作品简介</h2>
+                <p>${summary.intro}</p>
+                <h3>主题思想</h3>
+                <p>${summary.theme}</p>
+                <h3>创作背景</h3>
+                <p>${summary.background}</p>
+                <h3>文学价值</h3>
+                <p>${summary.significance}</p>
+            `;
+        }
+        
+        function renderChapters(chapters) {
+            document.getElementById('chapterList').innerHTML = chapters.map((ch, i) => `
+                <div class="chapter-item" onclick="this.classList.toggle('expanded')">
+                    <div class="chapter-title">
+                        <span>${ch.title}</span>
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="chapter-summary">${ch.summary}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderTimeline(timeline) {
+            document.getElementById('timelineContent').innerHTML = timeline.map(item => `
+                <div class="timeline-item">
+                    <div class="time">${item.time}</div>
+                    <div class="event">${item.event}</div>
+                    <div class="desc">${item.desc}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderScenes(scenes) {
+            document.getElementById('sceneGrid').innerHTML = scenes.map(scene => `
+                <div class="scene-card">
+                    <div class="scene-title">${scene.title}</div>
+                    <div class="scene-desc">${scene.desc}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderCharacters(characters) {
+            document.getElementById('characterList').innerHTML = characters
+                .filter(c => c.gen > 0)
+                .sort((a, b) => a.gen - b.gen || a.x - b.x)
+                .map(char => `
+                    <div class="chapter-item" onclick="this.classList.toggle('expanded')">
+                        <div class="chapter-title">
+                            <span>${char.name} <small style="color:#888">（第${char.gen}代）</small></span>
+                            <span class="toggle">▼</span>
+                        </div>
+                        <div class="chapter-summary">
+                            <p style="margin-bottom:10px">${char.desc}</p>
+                            <h4 style="color:#4a9eff;margin:10px 0 5px">关系网络</h4>
+                            <ul>
+                                ${char.relations.map(r => `<li><strong>${r.type}：</strong>${r.target}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `).join('');
+        }
+        
+        function renderGraph(characters, links) {
+            const svg = document.getElementById('graph');
+            svg.innerHTML = '';
+            
+            // 绘制关系线
+            links.forEach(link => {
+                const source = characters.find(c => c.id === link.source);
+                const target = characters.find(c => c.id === link.target);
+                if (!source || !target) return;
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const midX = (source.x + target.x) / 2;
+                const dy = target.y - source.y;
+                
+                let d;
+                if (Math.abs(dy) > 10) {
+                    d = `M ${source.x} ${source.y} C ${midX} ${source.y}, ${midX} ${target.y}, ${target.x} ${target.y}`;
+                } else {
+                    const arcMap = { 'marriage': -25, 'sibling': -55, 'love': -40, 'parent': -70 };
+                    const arcHeight = arcMap[link.type] || -30;
+                    d = `M ${source.x} ${source.y} Q ${midX} ${source.y + arcHeight} ${target.x} ${target.y}`;
+                }
+                
+                line.setAttribute('d', d);
+                line.setAttribute('class', `link ${link.type}`);
+                line.dataset.source = link.source;
+                line.dataset.target = link.target;
+                svg.appendChild(line);
+            });
+            
+            // 绘制人物节点
+            characters.forEach(char => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', 'node');
+                g.dataset.id = char.id;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', char.x);
+                circle.setAttribute('cy', char.y);
+                circle.setAttribute('r', 20);
+                circle.setAttribute('fill', char.color);
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', char.x);
+                text.setAttribute('y', char.y + 38);
+                text.textContent = char.name;
+                
+                g.appendChild(circle);
+                g.appendChild(text);
+                
+                g.addEventListener('click', () => selectCharacter(char));
+                
+                svg.appendChild(g);
+            });
+        }
+        
+        function selectCharacter(char) {
+            document.querySelectorAll('.node').forEach(n => n.classList.remove('highlighted', 'dimmed'));
+            document.querySelectorAll('.link').forEach(l => l.classList.remove('highlighted', 'dimmed'));
+            
+            const node = document.querySelector(`.node[data-id="${char.id}"]`);
+            node.classList.add('highlighted');
+            
+            const relatedIds = new Set([char.id]);
+            document.querySelectorAll('.link').forEach(l => {
+                if (l.dataset.source === char.id || l.dataset.target === char.id) {
+                    l.classList.add('highlighted');
+                    relatedIds.add(l.dataset.source);
+                    relatedIds.add(l.dataset.target);
+                } else {
+                    l.classList.add('dimmed');
+                }
+            });
+            
+            document.querySelectorAll('.node').forEach(n => {
+                if (!relatedIds.has(n.dataset.id)) {
+                    n.classList.add('dimmed');
+                }
+            });
+            
+            document.getElementById('placeholder').style.display = 'none';
+            const charDetail = document.getElementById('charDetail');
+            charDetail.classList.add('active');
+            charDetail.innerHTML = `
+                <div class="name">${char.name}</div>
+                <div class="gen">第${char.gen === 0 ? '外部' : char.gen}代</div>
+                <div class="desc">${char.desc}</div>
+                <div class="relations">
+                    <h4>关系网络</h4>
+                    <ul>
+                        ${char.relations.map(r => `<li><strong>${r.type}：</strong>${r.target}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        document.getElementById('graph').addEventListener('click', (e) => {
+            if (e.target.tagName === 'svg') {
+                document.querySelectorAll('.node').forEach(n => n.classList.remove('highlighted', 'dimmed'));
+                document.querySelectorAll('.link').forEach(l => l.classList.remove('highlighted', 'dimmed'));
+                document.getElementById('placeholder').style.display = 'block';
+                document.getElementById('charDetail').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
