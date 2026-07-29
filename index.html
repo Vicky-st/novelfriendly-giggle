@@ -627,6 +627,273 @@
                     { source: 'aus', target: 'last', type: 'parent' },
                     { source: 'melq', target: 'jab', type: 'friend' },
                 ]
+            },
+            '飘': {
+                author: '玛格丽特·米切尔',
+                summary: {
+                    intro: '《飘》是美国女作家玛格丽特·米切尔创作的长篇小说，以美国南北战争为背景，讲述了南方庄园主女儿斯嘉丽的爱情与成长故事。',
+                    theme: '小说通过斯嘉丽的视角，展现了南北战争前后南方社会的巨变。探讨了爱情、生存、土地、重建等主题。斯嘉丽从一个任性的南方淑女，成长为坚强务实的女性。',
+                    background: '作者耗时十年创作，1936年出版后立即引起轰动，1937年获得普利策奖。1939年改编的电影《乱世佳人》成为影史经典。',
+                    significance: '《飘》是美国文学史上最畅销的小说之一，被翻译成27种语言，全球销量超过2500万册。它深刻影响了美国人对南北战争和南方文化的认知。'
+                },
+                chapters: [
+                    { title: '第一部分：战前南方', summary: '斯嘉丽是塔拉庄园的大小姐，暗恋邻居艾希礼。艾希礼却与表妹梅兰妮订婚。斯嘉丽赌气嫁给梅兰妮的弟弟查尔斯。' },
+                    { title: '第二部分：战争爆发', summary: '南北战争爆发，斯嘉丽的第一任丈夫查尔斯战死。斯嘉丽来到亚特兰大，在战火中照顾即将生产的梅兰妮。' },
+                    { title: '第三部分：战火中的生存', summary: '亚特兰大沦陷，斯嘉丽带着梅兰妮和孩子逃回塔拉庄园。母亲去世，父亲发疯，庄园被北军洗劫。斯嘉丽发誓要生存下去。' },
+                    { title: '第四部分：战后重建', summary: '斯嘉丽为了保住塔拉庄园，抢走妹妹的未婚夫弗兰克。她经营木材生意，与瑞德·巴特勒结婚。' },
+                    { title: '第五部分：爱情的觉醒', summary: '斯嘉丽终于意识到自己爱的是瑞德，但瑞德已经心灰意冷。梅兰妮去世，瑞德离开。斯嘉丽决定回到塔拉，重新开始。' }
+                ],
+                timeline: [
+                    { time: '1861年', event: '战争爆发', desc: '南北战争爆发，南方青年纷纷参军。斯嘉丽在十二橡树园向艾希礼表白被拒。' },
+                    { time: '1862年', event: '第一任丈夫战死', desc: '斯嘉丽的第一任丈夫查尔斯在战争中病死，留下遗腹子韦德。' },
+                    { time: '1864年', event: '亚特兰大沦陷', desc: '斯嘉丽在战火中帮助梅兰妮生产，带着她和孩子逃回塔拉庄园。' },
+                    { time: '1865年', event: '战争结束', desc: '南方战败，斯嘉丽回到被毁的塔拉庄园，母亲去世，父亲发疯。' },
+                    { time: '1866年', event: '嫁给弗兰克', desc: '斯嘉丽为了保住塔拉庄园，抢走妹妹的未婚夫弗兰克·肯尼迪。' },
+                    { time: '1868年', event: '嫁给瑞德', desc: '弗兰克死后，斯嘉丽嫁给瑞德·巴特勒，生下女儿邦妮。' },
+                    { time: '1873年', event: '邦妮去世', desc: '女儿邦妮骑马意外坠马身亡，瑞德心灰意冷。' },
+                    { time: '1873年', event: '梅兰妮去世', desc: '梅兰妮病逝，斯嘉丽终于明白自己爱的是瑞德，但瑞德决定离开。' }
+                ],
+                scenes: [
+                    { title: '十二橡树园的烧烤', desc: '斯嘉丽在十二橡树园向艾希礼表白，被艾希礼婉拒。她赌气嫁给梅兰妮的弟弟查尔斯。' },
+                    { title: '亚特兰大大火', desc: '北军攻占亚特兰大，斯嘉丽在火光中带着梅兰妮和孩子逃出城市。' },
+                    { title: '塔拉的誓言', desc: '斯嘉丽站在被毁的塔拉庄园，举起萝卜发誓："上帝为我作证，我再也不要挨饿了！"' },
+                    { title: '瑞德的离开', desc: '"我的亲爱的，我真的不在乎。"瑞德说完这句话，转身离开。斯嘉丽决定回到塔拉重新开始。' }
+                ],
+                characters: [
+                    { id: 'scarlett', name: '斯嘉丽·奥哈拉', gen: 1, x: 400, y: 200, color: '#e74c3c', desc: '塔拉庄园主的女儿，美丽任性，坚强务实。经历三次婚姻，最终明白自己爱的是瑞德。', relations: [{type:'父亲',target:'杰拉尔德·奥哈拉'},{type:'母亲',target:'埃伦·奥哈拉'},{type:'第一任丈夫',target:'查尔斯·汉密尔顿'},{type:'第二任丈夫',target:'弗兰克·肯尼迪'},{type:'第三任丈夫',target:'瑞德·巴特勒'},{type:'暗恋',target:'艾希礼·威尔克斯'}] },
+                    { id: 'rhett', name: '瑞德·巴特勒', gen: 1, x: 700, y: 200, color: '#3498db', desc: '投机商人，英俊富有，深爱斯嘉丽。最终心灰意冷离开。', relations: [{type:'妻子',target:'斯嘉丽·奥哈拉'},{type:'女儿',target:'邦妮·巴特勒'}] },
+                    { id: 'ashley', name: '艾希礼·威尔克斯', gen: 1, x: 200, y: 350, color: '#2ecc71', desc: '斯嘉丽的邻居，温文尔雅，优柔寡断。与梅兰妮结婚，内心爱着斯嘉丽。', relations: [{type:'妻子',target:'梅兰妮·汉密尔顿'},{type:'暗恋',target:'斯嘉丽·奥哈拉'}] },
+                    { id: 'melanie', name: '梅兰妮·汉密尔顿', gen: 1, x: 500, y: 350, color: '#9b59b6', desc: '艾希礼的妻子，善良宽容，是斯嘉丽最忠实的朋友。', relations: [{type:'丈夫',target:'艾希礼·威尔克斯'},{type:'朋友',target:'斯嘉丽·奥哈拉'}] },
+                    { id: 'gerald', name: '杰拉尔德·奥哈拉', gen: 0, x: 100, y: 100, color: '#e67e22', desc: '斯嘉丽的父亲，塔拉庄园主，爱尔兰移民。', relations: [{type:'妻子',target:'埃伦·奥哈拉'},{type:'女儿',target:'斯嘉丽·奥哈拉'}] },
+                    { id: 'ellen', name: '埃伦·奥哈拉', gen: 0, x: 300, y: 100, color: '#ff9800', desc: '斯嘉丽的母亲，优雅高贵的南方淑女。战争期间去世。', relations: [{type:'丈夫',target:'杰拉尔德·奥哈拉'},{type:'女儿',target:'斯嘉丽·奥哈拉'}] },
+                    { id: 'charles', name: '查尔斯·汉密尔顿', gen: 1, x: 600, y: 350, color: '#607d8b', desc: '梅兰妮的弟弟，斯嘉丽的第一任丈夫。战争初期病死。', relations: [{type:'妻子',target:'斯嘉丽·奥哈拉'},{type:'姐姐',target:'梅兰妮·汉密尔顿'}] },
+                    { id: 'frank', name: '弗兰克·肯尼迪', gen: 1, x: 800, y: 350, color: '#795548', desc: '斯嘉丽的第二任丈夫，原本要娶斯嘉丽的妹妹。被斯嘉丽抢走。', relations: [{type:'妻子',target:'斯嘉丽·奥哈拉'}] },
+                    { id: 'bonnie', name: '邦妮·巴特勒', gen: 2, x: 550, y: 500, color: '#ff5722', desc: '斯嘉丽与瑞德的女儿，美丽可爱。骑马意外坠马身亡。', relations: [{type:'父亲',target:'瑞德·巴特勒'},{type:'母亲',target:'斯嘉丽·奥哈拉'}] },
+                ],
+                links: [
+                    { source: 'gerald', target: 'scarlett', type: 'parent' },
+                    { source: 'ellen', target: 'scarlett', type: 'parent' },
+                    { source: 'gerald', target: 'ellen', type: 'marriage' },
+                    { source: 'scarlett', target: 'charles', type: 'marriage' },
+                    { source: 'scarlett', target: 'frank', type: 'marriage' },
+                    { source: 'scarlett', target: 'rhett', type: 'marriage' },
+                    { source: 'scarlett', target: 'ashley', type: 'love' },
+                    { source: 'ashley', target: 'melanie', type: 'marriage' },
+                    { source: 'charles', target: 'melanie', type: 'sibling' },
+                    { source: 'rhett', target: 'bonnie', type: 'parent' },
+                    { source: 'scarlett', target: 'bonnie', type: 'parent' },
+                    { source: 'scarlett', target: 'melanie', type: 'friend' },
+                ]
+            },
+            '简爱': {
+                author: '夏洛蒂·勃朗特',
+                summary: {
+                    intro: '《简爱》是英国女作家夏洛蒂·勃朗特创作的长篇小说，是一部具有自传色彩的作品。讲述了一位从小变成孤儿的英国女子在各种磨难中不断追求自由与尊严的故事。',
+                    theme: '小说探讨了爱情、平等、独立、尊严等主题。简爱虽然出身卑微、相貌平平，但凭借坚强的意志和独立的灵魂，最终获得了真正的幸福。',
+                    background: '小说于1847年出版，立即引起轰动。作者以笔名"柯勒·贝尔"发表，当时女性作家受到歧视。小说带有作者自身经历的影子。',
+                    significance: '《简爱》是英国文学史上最经典的小说之一，多次被改编成电影、电视剧。它塑造了一个追求平等、独立自主的女性形象，影响深远。'
+                },
+                chapters: [
+                    { title: '第一部分：盖茨黑德', summary: '简爱父母双亡，寄养在舅妈家，受尽虐待。被送到洛伍德慈善学校。' },
+                    { title: '第二部分：洛伍德学校', summary: '简爱在洛伍德学校度过八年，条件艰苦。好友海伦病逝。简爱成为教师。' },
+                    { title: '第三部分：桑菲尔德庄园', summary: '简爱离开学校，到桑菲尔德庄园当家庭教师。与庄园主罗切斯特相爱。' },
+                    { title: '第四部分：婚礼中断', summary: '婚礼当天，简爱得知罗切斯特已有疯妻贝莎·梅森，被关在阁楼里。简爱痛苦离开。' },
+                    { title: '第五部分：沼泽居', summary: '简爱流浪到沼泽居，被圣约翰兄妹收留。发现自己是他们的表姐，继承了叔叔的遗产。' },
+                    { title: '第六部分：重逢', summary: '简爱拒绝圣约翰的求婚，回到桑菲尔德。庄园已被疯妇放火烧毁，罗切斯特失明残疾。简爱与罗切斯特结婚。' }
+                ],
+                timeline: [
+                    { time: '简爱幼年', event: '寄养舅妈家', desc: '简爱父母双亡，寄养在盖茨黑德舅妈家，受尽表兄妹和舅妈的虐待。' },
+                    { time: '10岁', event: '洛伍德学校', desc: '简爱被送到洛伍德慈善学校，条件恶劣，好友海伦·伯恩斯病逝。' },
+                    { time: '18岁', event: '成为教师', desc: '简爱在洛伍德学校学习六年，任教两年后决定离开。' },
+                    { time: '18岁', event: '桑菲尔德庄园', desc: '简爱到桑菲尔德庄园当家庭教师，教学生阿黛尔。与罗切斯特相爱。' },
+                    { time: '同年', event: '求婚', desc: '罗切斯特向简爱求婚，简爱答应。' },
+                    { time: '婚礼当天', event: '婚礼中断', desc: '婚礼上有人揭发罗切斯特已有妻子，简爱痛苦离开桑菲尔德。' },
+                    { time: '流浪后', event: '沼泽居', desc: '简爱流浪到沼泽居，被圣约翰兄妹收留，发现自己是他们的表姐。' },
+                    { time: '一年后', event: '重逢', desc: '简爱回到桑菲尔德，庄园已被烧毁，罗切斯特失明残疾。两人结婚。' }
+                ],
+                scenes: [
+                    { title: '红房子', desc: '简爱小时候被关在红房子里，那是她舅舅去世的房间，吓得她大病一场。' },
+                    { title: '海伦之死', desc: '好友海伦·伯恩斯在洛伍德学校死于肺结核，临终前与简爱相拥而眠。' },
+                    { title: '求婚', desc: '罗切斯特在花园里向简爱求婚："你虽然贫穷、卑微、不美、矮小，但我们有同样的灵魂！"' },
+                    { title: '阁楼上的疯女人', desc: '婚礼当天，简爱发现罗切斯特已有妻子贝莎·梅森，被关在阁楼里多年。' },
+                    { title: '重逢', desc: '简爱回到失明残疾的罗切斯特身边，两人在芬丁庄园结婚。' }
+                ],
+                characters: [
+                    { id: 'jane', name: '简·爱', gen: 1, x: 400, y: 200, color: '#e74c3c', desc: '孤女，家庭教师。追求平等爱情和独立尊严，最终获得幸福。', relations: [{type:'恋人',target:'爱德华·罗切斯特'},{type:'追求者',target:'圣约翰·里弗斯'},{type:'好友',target:'海伦·伯恩斯'}] },
+                    { id: 'rochester', name: '爱德华·罗切斯特', gen: 1, x: 700, y: 200, color: '#3498db', desc: '桑菲尔德庄园主，有疯妻。深爱简爱，最终失明残疾后与简爱结婚。', relations: [{type:'妻子',target:'贝莎·梅森'},{type:'恋人',target:'简·爱'}] },
+                    { id: 'stjohn', name: '圣约翰·里弗斯', gen: 1, x: 200, y: 350, color: '#2ecc71', desc: '牧师，向简爱求婚，希望她一起去印度传教。被简爱拒绝。', relations: [{type:'追求',target:'简·爱'}] },
+                    { id: 'bertha', name: '贝莎·梅森', gen: 1, x: 500, y: 350, color: '#9b59b6', desc: '罗切斯特的疯妻，被关在阁楼里。最终放火烧毁庄园，跳楼身亡。', relations: [{type:'丈夫',target:'爱德华·罗切斯特'}] },
+                    { id: 'helen', name: '海伦·伯恩斯', gen: 1, x: 600, y: 350, color: '#ff9800', desc: '简爱在洛伍德学校的好友，虔诚善良，死于肺结核。', relations: [{type:'好友',target:'简·爱'}] },
+                ],
+                links: [
+                    { source: 'jane', target: 'rochester', type: 'love' },
+                    { source: 'rochester', target: 'bertha', type: 'marriage' },
+                    { source: 'stjohn', target: 'jane', type: 'love' },
+                    { source: 'helen', target: 'jane', type: 'friend' },
+                ]
+            },
+            '茶花女': {
+                author: '小仲马',
+                summary: {
+                    intro: '《茶花女》是法国作家小仲马创作的长篇小说，根据作者自身经历改编。讲述巴黎名妓玛格丽特与青年阿尔芒的爱情悲剧。',
+                    theme: '小说探讨了爱情、牺牲、社会偏见等主题。玛格丽特为了阿尔芒的前途，牺牲自己的爱情，最终孤独死去。批判了资产阶级的虚伪道德。',
+                    background: '小仲马是法国作家大仲马的私生子。小说根据他与妓女玛丽·杜普莱西的真实恋情改编。1848年出版，1852年改编成话剧。',
+                    significance: '《茶花女》是法国文学史上最著名的爱情小说之一，多次被改编成歌剧、电影。威尔第据此创作了著名歌剧《茶花女》。'
+                },
+                chapters: [
+                    { title: '第一部分：相遇', summary: '青年阿尔芒在剧院遇到名妓玛格丽特，一见钟情。玛格丽特患有肺结核，常咳血。' },
+                    { title: '第二部分：相爱', summary: '阿尔芒追求玛格丽特，两人相爱。玛格丽特离开巴黎，与阿尔芒在乡下同居。' },
+                    { title: '第三部分：阻挠', summary: '阿尔芒的父亲迪瓦尔先生反对这段关系，私下找到玛格丽特，要求她离开阿尔芒。' },
+                    { title: '第四部分：牺牲', summary: '玛格丽特为了阿尔芒的前途和妹妹的婚事，忍痛离开阿尔芒，回到巴黎重操旧业。' },
+                    { title: '第五部分：误解', summary: '阿尔芒以为玛格丽特贪慕虚荣，处处报复羞辱她。玛格丽特病情加重。' },
+                    { title: '第六部分：真相', summary: '玛格丽特病逝。阿尔芒从她的日记中得知真相，悔恨不已。' }
+                ],
+                timeline: [
+                    { time: '相遇', event: '剧院相遇', desc: '阿尔芒在剧院遇到名妓玛格丽特，一见钟情。' },
+                    { time: '追求', event: '追求玛格丽特', desc: '阿尔芒追求玛格丽特，每天送花，写情书。玛格丽特被感动。' },
+                    { time: '相爱', event: '乡下同居', desc: '玛格丽特离开巴黎，与阿尔芒在乡下同居，度过美好时光。' },
+                    { time: '分离', event: '父亲阻挠', desc: '阿尔芒的父亲迪瓦尔先生找到玛格丽特，要求她离开阿尔芒。' },
+                    { time: '牺牲', event: '玛格丽特离开', desc: '玛格丽特为了阿尔芒的前途，忍痛离开，回到巴黎重操旧业。' },
+                    { time: '报复', event: '阿尔芒报复', desc: '阿尔芒以为玛格丽特贪慕虚荣，处处羞辱她。' },
+                    { time: '病逝', event: '玛格丽特去世', desc: '玛格丽特肺结核病逝，孤独死去。' },
+                    { time: '真相', event: '阿尔芒得知真相', desc: '阿尔芒从玛格丽特的日记中得知真相，悔恨不已。' }
+                ],
+                scenes: [
+                    { title: '茶花', desc: '玛格丽特总是佩戴茶花，因此得名"茶花女"。她喜欢白茶花，象征纯洁。' },
+                    { title: '乡下生活', desc: '玛格丽特与阿尔芒在乡下的美好时光，是她一生中最幸福的时刻。' },
+                    { title: '父亲的恳求', desc: '迪瓦尔先生恳求玛格丽特离开阿尔芒："为了你爱的人的前途，请你离开他。"' },
+                    { title: '临终日记', desc: '玛格丽特临终前写下日记，记录了她对阿尔芒的爱和牺牲。' }
+                ],
+                characters: [
+                    { id: 'marguerite', name: '玛格丽特·戈蒂埃', gen: 1, x: 400, y: 200, color: '#e74c3c', desc: '巴黎名妓，患肺结核。深爱阿尔芒，为了他的前途牺牲自己的爱情。', relations: [{type:'恋人',target:'阿尔芒·迪瓦尔'},{type:'朋友',target:'普珥珥丝'}] },
+                    { id: 'armand', name: '阿尔芒·迪瓦尔', gen: 1, x: 700, y: 200, color: '#3498db', desc: '青年律师，深爱玛格丽特。误会玛格丽特背叛，后得知真相悔恨不已。', relations: [{type:'恋人',target:'玛格丽特·戈蒂埃'},{type:'父亲',target:'迪瓦尔先生'}] },
+                    { id: 'duval', name: '迪瓦尔先生', gen: 0, x: 300, y: 350, color: '#2ecc71', desc: '阿尔芒的父亲，反对儿子与玛格丽特的关系，私下要求玛格丽特离开。', relations: [{type:'儿子',target:'阿尔芒·迪瓦尔'}] },
+                    { id: 'prudence', name: '普珥珥丝', gen: 1, x: 600, y: 350, color: '#9b59b6', desc: '玛格丽特的朋友，虚伪势利，最终背叛了玛格丽特。', relations: [{type:'朋友',target:'玛格丽特·戈蒂埃'}] },
+                ],
+                links: [
+                    { source: 'marguerite', target: 'armand', type: 'love' },
+                    { source: 'duval', target: 'armand', type: 'parent' },
+                    { source: 'prudence', target: 'marguerite', type: 'friend' },
+                ]
+            },
+            '红楼梦': {
+                author: '曹雪芹',
+                summary: {
+                    intro: '《红楼梦》是中国古典四大名著之首，清代作家曹雪芹创作的章回体长篇小说。以贾宝玉、林黛玉、薛宝钗的爱情婚姻悲剧为主线，展现了封建大家族的兴衰。',
+                    theme: '小说以贾、史、王、薛四大家族的兴衰为背景，以贾宝玉和林黛玉的爱情悲剧为主线，真实而艺术地反映了我国封建社会走向衰亡的历史趋势。',
+                    background: '曹雪芹出身于清代内务府正白旗包衣世家，家族曾显赫一时，后家道中落。小说带有作者自传性质，"字字看来皆是血，十年辛苦不寻常"。',
+                    significance: '《红楼梦》是中国古典小说的巅峰之作，被誉为"中国封建社会的百科全书"。形成了专门的"红学"研究领域，影响深远。'
+                },
+                chapters: [
+                    { title: '第一回：甄士隐梦幻识通灵', summary: '女娲补天遗下一块石头，被一僧一道携入红尘。石头幻化为通灵宝玉，随贾宝玉降生。' },
+                    { title: '第二回：贾夫人仙逝扬州城', summary: '林黛玉母亲去世，被接到贾府。初见贾宝玉，两人似曾相识。' },
+                    { title: '第三回：贾雨村夤缘复旧职', summary: '薛宝钗进贾府，与贾宝玉、林黛玉形成三角关系。宝钗有金锁，宝玉有玉，"金玉良缘"之说流传。' },
+                    { title: '第四回：薄命女偏逢薄命郎', summary: '贾宝玉梦游太虚幻境，看到金陵十二钗的判词。与林黛玉共读《西厢记》，感情加深。' },
+                    { title: '第五回：大观园试才题对额', summary: '元妃省亲，贾府修建大观园。贾宝玉和众姐妹搬入大观园，度过一段美好时光。' },
+                    { title: '第六回：贾宝玉初试云雨情', summary: '贾宝玉与袭人初试云雨。黛玉葬花，感叹"花谢花飞花满天，红消香断有谁怜"。' },
+                    { title: '第七回：林黛玉重建桃花社', summary: '探春发起海棠诗社，众姐妹作诗。贾宝玉挨打，黛玉哭肿双眼。' },
+                    { title: '第八回：苦绛珠魂归离恨天', summary: '贾府被抄家，贾母去世。王熙凤病逝，探春远嫁。林黛玉泪尽而逝。' },
+                    { title: '第九回：贾宝玉出家', summary: '贾宝玉与薛宝钗结婚，但心中只有林黛玉。最终看破红尘，出家为僧。' }
+                ],
+                timeline: [
+                    { time: '开篇', event: '通灵宝玉', desc: '女娲补天遗下的石头幻化为通灵宝玉，随贾宝玉降生。' },
+                    { time: '黛玉进府', event: '林黛玉进贾府', desc: '林黛玉母亲去世，被接到贾府，初见贾宝玉。' },
+                    { time: '宝钗进府', event: '薛宝钗进贾府', desc: '薛宝钗进贾府，金玉良缘之说流传。' },
+                    { time: '太虚幻境', event: '宝玉梦游太虚幻境', desc: '贾宝玉梦游太虚幻境，看到金陵十二钗的判词。' },
+                    { time: '元妃省亲', event: '元妃省亲', desc: '元妃省亲，贾府修建大观园。' },
+                    { time: '共读西厢', event: '宝黛共读《西厢记》', desc: '贾宝玉和林黛玉共读《西厢记》，感情加深。' },
+                    { time: '黛玉葬花', event: '黛玉葬花', desc: '林黛玉葬花，感叹"花谢花飞花满天，红消香断有谁怜"。' },
+                    { time: '贾府被抄', event: '贾府被抄家', desc: '贾府被抄家，贾母去世，王熙凤病逝。' },
+                    { time: '黛玉之死', event: '林黛玉泪尽而逝', desc: '林黛玉得知宝玉要娶宝钗，泪尽而逝。' },
+                    { time: '宝玉出家', event: '贾宝玉出家', desc: '贾宝玉看破红尘，出家为僧。' }
+                ],
+                scenes: [
+                    { title: '宝黛初会', desc: '林黛玉进贾府，初见贾宝玉。宝玉说："这个妹妹我曾见过的。"' },
+                    { title: '金玉良缘', desc: '薛宝钗有金锁，贾宝玉有通灵宝玉，"金玉良缘"之说流传。' },
+                    { title: '共读西厢', desc: '宝玉和黛玉在桃花树下共读《西厢记》，两人以"多愁多病身"和"倾国倾城貌"互喻。' },
+                    { title: '黛玉葬花', desc: '林黛玉葬花，吟唱《葬花吟》："花谢花飞花满天，红消香断有谁怜。"' },
+                    { title: '宝玉挨打', desc: '贾宝玉因结交戏子蒋玉菡等事被贾政痛打，黛玉哭肿双眼。' },
+                    { title: '黛玉焚稿', desc: '林黛玉得知宝玉要娶宝钗，焚毁诗稿，泪尽而逝。' },
+                    { title: '宝玉出家', desc: '贾宝玉看破红尘，在雪地里拜别父亲，出家为僧。' }
+                ],
+                characters: [
+                    { id: 'baoyu', name: '贾宝玉', gen: 2, x: 400, y: 200, color: '#e74c3c', desc: '荣国府嫡孙，衔玉而生。性格叛逆，厌恶仕途经济，与黛玉相爱。最终出家。', relations: [{type:'父亲',target:'贾政'},{type:'母亲',target:'王夫人'},{type:'恋人',target:'林黛玉'},{type:'妻子',target:'薛宝钗'}] },
+                    { id: 'daiyu', name: '林黛玉', gen: 2, x: 700, y: 200, color: '#3498db', desc: '贾母外孙女，才华横溢，多愁善感。与宝玉相爱，最终泪尽而逝。', relations: [{type:'恋人',target:'贾宝玉'},{type:'外祖母',target:'贾母'}] },
+                    { id: 'baochai', name: '薛宝钗', gen: 2, x: 200, y: 350, color: '#2ecc71', desc: '薛姨妈之女，品格端庄，容貌丰美。有金锁，与宝玉有"金玉良缘"之说。', relations: [{type:'丈夫',target:'贾宝玉'},{type:'母亲',target:'薛姨妈'}] },
+                    { id: 'xifeng', name: '王熙凤', gen: 2, x: 500, y: 350, color: '#9b59b6', desc: '贾琏之妻，荣国府管家。精明强干，心狠手辣。最终病逝。', relations: [{type:'丈夫',target:'贾琏'},{type:'姑姑',target:'王夫人'}] },
+                    { id: 'jiamu', name: '贾母', gen: 0, x: 300, y: 100, color: '#e67e22', desc: '贾府老祖宗，史太君。疼爱宝玉和黛玉。', relations: [{type:'儿子',target:'贾政'},{type:'外孙女',target:'林黛玉'}] },
+                    { id: 'jiazheng', name: '贾政', gen: 1, x: 100, y: 200, color: '#607d8b', desc: '贾宝玉之父，为人端方正直。对宝玉管教严格。', relations: [{type:'父亲',target:'贾母'},{type:'妻子',target:'王夫人'},{type:'儿子',target:'贾宝玉'}] },
+                    { id: 'wangfuren', name: '王夫人', gen: 1, x: 300, y: 300, color: '#ff9800', desc: '贾政之妻，宝玉之母。表面慈善，实则心狠。', relations: [{type:'丈夫',target:'贾政'},{type:'儿子',target:'贾宝玉'}] },
+                    { id: 'jialian', name: '贾琏', gen: 2, x: 700, y: 350, color: '#795548', desc: '贾赦之子，王熙凤之夫。风流好色。', relations: [{type:'妻子',target:'王熙凤'}] },
+                    { id: 'xueyima', name: '薛姨妈', gen: 1, x: 600, y: 100, color: '#ff5722', desc: '薛宝钗之母，王夫人之妹。', relations: [{type:'女儿',target:'薛宝钗'},{type:'姐姐',target:'王夫人'}] },
+                ],
+                links: [
+                    { source: 'jiamu', target: 'jiazheng', type: 'parent' },
+                    { source: 'jiazheng', target: 'wangfuren', type: 'marriage' },
+                    { source: 'jiazheng', target: 'baoyu', type: 'parent' },
+                    { source: 'wangfuren', target: 'baoyu', type: 'parent' },
+                    { source: 'jiamu', target: 'daiyu', type: 'parent' },
+                    { source: 'baoyu', target: 'daiyu', type: 'love' },
+                    { source: 'baoyu', target: 'baochai', type: 'marriage' },
+                    { source: 'xueyima', target: 'baochai', type: 'parent' },
+                    { source: 'wangfuren', target: 'xueyima', type: 'sibling' },
+                    { source: 'xifeng', target: 'jialian', type: 'marriage' },
+                    { source: 'xifeng', target: 'wangfuren', type: 'friend' },
+                ]
+            },
+            '战争与和平': {
+                author: '列夫·托尔斯泰',
+                summary: {
+                    intro: '《战争与和平》是俄国作家列夫·托尔斯泰创作的长篇小说，被誉为"世界上最伟大的小说"。以1812年俄国卫国战争为中心，展现了俄国社会各阶层的生活。',
+                    theme: '小说通过四大贵族家庭的经历，探讨了战争与和平、历史与个人、家庭与社会等主题。展现了俄国人民在卫国战争中的英雄气概。',
+                    background: '托尔斯泰耗时六年创作（1863-1869），以1812年拿破仑入侵俄国的卫国战争为背景。小说融合了历史、哲学和文学，是现实主义文学的巅峰之作。',
+                    significance: '《战争与和平》是世界文学史上最伟大的小说之一，多次被改编成电影、电视剧。它深刻影响了后世的文学创作和历史观。'
+                },
+                chapters: [
+                    { title: '第一卷：1805年', summary: '拿破仑战争爆发。安德烈公爵、皮埃尔、尼古拉等贵族青年卷入战争。' },
+                    { title: '第二卷：1806-1811年', summary: '战争间歇期。皮埃尔继承遗产成为伯爵，娶了海伦。安德烈爱上娜塔莎。' },
+                    { title: '第三卷：1812年战争', summary: '拿破仑入侵俄国。莫斯科大火，俄军撤退。鲍罗金诺战役。' },
+                    { title: '第四卷：1812-1813年', summary: '莫斯科沦陷，法军撤退。安德烈重伤去世，娜塔莎照顾他。' },
+                    { title: '第五卷：战后', summary: '战争结束。皮埃尔与娜塔莎结婚，尼古拉与玛丽亚结婚。' }
+                ],
+                timeline: [
+                    { time: '1805年', event: '战争爆发', desc: '拿破仑战争爆发，俄国贵族青年卷入战争。' },
+                    { time: '1805年', event: '奥斯特里茨战役', desc: '俄奥联军惨败，安德烈公爵受伤。' },
+                    { time: '1806年', event: '皮埃尔继承遗产', desc: '皮埃尔继承遗产成为伯爵，娶了海伦。' },
+                    { time: '1809年', event: '安德烈爱上娜塔莎', desc: '安德烈公爵爱上娜塔莎·罗斯托娃，两人订婚。' },
+                    { time: '1812年', event: '拿破仑入侵', desc: '拿破仑入侵俄国，莫斯科大火。' },
+                    { time: '1812年', event: '鲍罗金诺战役', desc: '鲍罗金诺战役，俄军惨胜。' },
+                    { time: '1812年', event: '莫斯科沦陷', desc: '莫斯科沦陷，法军撤退。' },
+                    { time: '1813年', event: '安德烈去世', desc: '安德烈公爵重伤去世，娜塔莎照顾他。' },
+                    { time: '1813年', event: '战后', desc: '战争结束，皮埃尔与娜塔莎结婚。' }
+                ],
+                scenes: [
+                    { title: '奥斯特里茨战役', desc: '1805年奥斯特里茨战役，俄奥联军惨败。安德烈公爵仰望天空，思考人生的意义。' },
+                    { title: '娜塔莎的舞会', desc: '娜塔莎在舞会上第一次跳舞，展现了青春的美丽和活力。' },
+                    { title: '莫斯科大火', desc: '1812年莫斯科大火，俄军撤退，城市化为灰烬。' },
+                    { title: '安德烈之死', desc: '安德烈公爵重伤去世，娜塔莎在他临终前照顾他。' },
+                    { title: '皮埃尔被俘', desc: '皮埃尔在莫斯科被法军俘虏，在俘虏营中遇到普拉东，领悟了人生的真谛。' }
+                ],
+                characters: [
+                    { id: 'pierre', name: '皮埃尔·别祖霍夫', gen: 1, x: 400, y: 200, color: '#e74c3c', desc: '私生子，继承遗产成为伯爵。善良真诚，寻找人生意义。最终与娜塔莎结婚。', relations: [{type:'第一任妻子',target:'海伦'},{type:'妻子',target:'娜塔莎'},{type:'朋友',target:'安德烈公爵'}] },
+                    { id: 'andrei', name: '安德烈·鲍尔康斯基', gen: 1, x: 700, y: 200, color: '#3498db', desc: '公爵，冷静理智，追求荣誉。在战争中重伤去世。', relations: [{type:'恋人',target:'娜塔莎'},{type:'妹妹',target:'玛丽亚'},{type:'朋友',target:'皮埃尔'}] },
+                    { id: 'natasha', name: '娜塔莎·罗斯托娃', gen: 1, x: 200, y: 350, color: '#2ecc71', desc: '罗斯托夫伯爵之女，活泼美丽。与安德烈订婚，后与皮埃尔结婚。', relations: [{type:'恋人',target:'安德烈公爵'},{type:'丈夫',target:'皮埃尔'},{type:'父亲',target:'罗斯托夫伯爵'}] },
+                    { id: 'nikolai', name: '尼古拉·罗斯托夫', gen: 1, x: 500, y: 350, color: '#9b59b6', desc: '娜塔莎的哥哥，骠骑兵军官。与玛丽亚结婚。', relations: [{type:'妹妹',target:'娜塔莎'},{type:'妻子',target:'玛丽亚'}] },
+                    { id: 'helen', name: '海伦·库拉金', gen: 1, x: 600, y: 350, color: '#ff9800', desc: '库拉金之女，美貌但放荡。皮埃尔的第一任妻子。', relations: [{type:'丈夫',target:'皮埃尔'}] },
+                    { id: 'maria', name: '玛丽亚·鲍尔康斯卡娅', gen: 1, x: 300, y: 100, color: '#e67e22', desc: '安德烈的妹妹，虔诚善良。与尼古拉结婚。', relations: [{type:'哥哥',target:'安德烈公爵'},{type:'丈夫',target:'尼古拉'}] },
+                    { id: 'rostov', name: '罗斯托夫伯爵', gen: 0, x: 100, y: 200, color: '#607d8b', desc: '娜塔莎和尼古拉的父亲，善良但挥霍无度。', relations: [{type:'女儿',target:'娜塔莎'},{type:'儿子',target:'尼古拉'}] },
+                ],
+                links: [
+                    { source: 'rostov', target: 'natasha', type: 'parent' },
+                    { source: 'rostov', target: 'nikolai', type: 'parent' },
+                    { source: 'natasha', target: 'nikolai', type: 'sibling' },
+                    { source: 'pierre', target: 'helen', type: 'marriage' },
+                    { source: 'pierre', target: 'natasha', type: 'marriage' },
+                    { source: 'andrei', target: 'natasha', type: 'love' },
+                    { source: 'andrei', target: 'maria', type: 'sibling' },
+                    { source: 'nikolai', target: 'maria', type: 'marriage' },
+                    { source: 'pierre', target: 'andrei', type: 'friend' },
+                ]
             }
         };
         
