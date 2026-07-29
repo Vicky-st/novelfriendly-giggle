@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美课AI搜索 - 问答日志分析报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 24px 40px; }
+        .header h1 { font-size: 24px; margin-bottom: 4px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .tab-nav { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; overflow-x: auto; }
+        .tab-btn { padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn:hover { color: #1e3a5f; background: #f8fafc; }
+        .tab-btn.active { color: #1e3a5f; border-bottom-color: #1e3a5f; background: white; }
+        .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.2s; position: relative; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .card .label { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .card .value { font-size: 28px; font-weight: 700; color: #1e3a5f; }
+        .card .sub { font-size: 12px; color: #888; margin-top: 4px; }
+        .card.warning .value { color: #dc3545; }
+        .card.success .value { color: #28a745; }
+        .card.info .value { color: #17a2b8; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .section h3 { color: #1e3a5f; margin-bottom: 16px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .section h3::before { content: ''; display: inline-block; width: 4px; height: 18px; background: #1e3a5f; border-radius: 2px; }
+        .table-wrapper { overflow-x: auto; max-height: 500px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead { background: #1e3a5f; color: white; position: sticky; top: 0; z-index: 1; }
+        th { padding: 12px 16px; text-align: left; font-weight: 500; white-space: nowrap; }
+        td { padding: 10px 16px; border-bottom: 1px solid #eee; }
+        tbody tr:hover { background: #f8f9fa; }
+        td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        td.center { text-align: center; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .badge-blue { background: #e8f4fd; color: #2c5282; }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+        .badge-yellow { background: #fff3cd; color: #856404; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .badge-orange { background: #ffedd5; color: #c2410c; }
+        .badge-pink { background: #fce7f3; color: #be185d; }
+        .badge-teal { background: #ccfbf1; color: #0f766e; }
+        .progress-bar { background: #e9ecef; border-radius: 4px; height: 8px; overflow: hidden; margin-bottom: 4px; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .progress-fill.blue { background: #2c5282; }
+        .progress-fill.green { background: #28a745; }
+        .progress-fill.red { background: #dc3545; }
+        .progress-fill.yellow { background: #ffc107; }
+        .progress-fill.purple { background: #7c3aed; }
+        .progress-fill.orange { background: #ea580c; }
+        .progress-fill.pink { background: #db2777; }
+        .progress-fill.teal { background: #0d9488; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .metric-row:last-child { border-bottom: none; }
+        .metric-label { color: #666; font-size: 13px; }
+        .metric-value { font-weight: 600; color: #1e3a5f; font-size: 14px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .insight-card { background: #f8fafc; border-left: 4px solid #2c5282; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 12px; }
+        .insight-card .title { font-weight: 600; color: #1e3a5f; margin-bottom: 8px; }
+        .insight-card .content { font-size: 13px; color: #64748b; line-height: 1.6; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 16px; width: 90%; max-width: 900px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 18px; color: #1e3a5f; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 4px 12px; border-radius: 8px; }
+        .modal-close:hover { background: #f0f0f0; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .search-box { margin-bottom: 16px; }
+        .search-box input { width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .search-box input:focus { outline: none; border-color: #2c5282; box-shadow: 0 0 0 3px rgba(44,82,130,0.1); }
+        .hot-tag { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 13px; margin: 4px; }
+        .bar-chart { margin-bottom: 8px; }
+        .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .bar-label { width: 120px; font-size: 13px; color: #333; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bar-wrap { flex: 1; }
+        .bar-count { width: 80px; font-size: 12px; color: #666; }
+        .sub-tab { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .sub-tab-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid #ddd; background: white; color: #666; transition: all 0.2s; }
+        .sub-tab-btn:hover { border-color: #2c5282; color: #2c5282; }
+        .sub-tab-btn.active { background: #1e3a5f; color: white; border-color: #1e3a5f; }
+        .dept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .dept-card { background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
+        .dept-card:hover { border-color: #2c5282; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .dept-card .dept-name { font-size: 15px; font-weight: 600; color: #1e3a5f; margin-bottom: 12px; }
+        .dept-card .dept-stat { display: flex; justify-content: space-between; font-size: 12px; color: #666; padding: 4px 0; }
+        .dept-card .dept-stat .val { font-weight: 600; color: #333; }
+        .heatmap { display: grid; gap: 2px; }
+        .heatmap-cell { padding: 8px; text-align: center; font-size: 11px; border-radius: 4px; }
+        .footer { text-align: center; padding: 24px; color: #999; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 美课AI搜索 - 问答日志分析报告</h1>
+        <p>数据范围: 2026-06-26 至 2026-07-26 | 生成时间: 2026-07-29 10:35</p>
+    </div>
+    <div class="container">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('overview')">概览</button>
+            <button class="tab-btn" onclick="switchTab('usage')">使用量分析</button>
+            <button class="tab-btn" onclick="switchTab('user')">用户画像</button>
+            <button class="tab-btn" onclick="switchTab('question')">问题特征</button>
+            <button class="tab-btn" onclick="switchTab('topic')">主题分析</button>
+            <button class="tab-btn" onclick="switchTab('dept')">部门分析</button>
+            <button class="tab-btn" onclick="switchTab('job')">职群/职种</button>
+            <button class="tab-btn" onclick="switchTab('quality')">响应质量</button>
+        </div>
+
+        <!-- 概览 -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="summary-cards">
+                <div class="card">
+                    <div class="label">总记录数</div>
+                    <div class="value">11,636</div>
+                    <div class="sub">问答总次数</div>
+                </div>
+                <div class="card info">
+                    <div class="label">独立用户</div>
+                    <div class="value">3,941</div>
+                    <div class="sub">去重用户数</div>
+                </div>
+                <div class="card success">
+                    <div class="label">平均DAU</div>
+                    <div class="value">233</div>
+                    <div class="sub">峰值 657 (2026-07-22)</div>
+                </div>
+                <div class="card warning">
+                    <div class="label">流失率</div>
+                    <div class="value">45.6%</div>
+                    <div class="sub">一次性用户 1796 人</div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>关键洞察</h3>
+                <div class="insight-card">
+                    <div class="title">📈 使用概况</div>
+                    <div class="content">共 11,636 条问答记录，3,941 位独立用户参与，日均 233 人使用。人均使用 3.0 次。</div>
+                </div>
+                <div class="insight-card">
+                    <div class="title">🔥 最热问题</div>
+                    <div class="content">智能体(243次) | creo(136次) | 我想提升AI应用能力，可以学什么(112次) | 小龙虾(105次) | UG(103次)</div>
+                </div>
+                <div class="insight-card">
+                    <div class="title">️ 响应效率</div>
+                    <div class="content">平均响应时间 55.5 秒，1625 条(14.0%)在30秒内完成。</div>
+                </div>
+                <div class="insight-card">
+                    <div class="title">🏢 部门分布</div>
+                    <div class="content">智能家居事业群(5578条,47.9%) | 其他单位(3367条,28.9%) | 专业平台(1111条,9.5%) | 集团职能(780条,6.7%) | 自主业务(400条,3.4%) | 关联单位(373条,3.2%)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用量分析 -->
+        <div id="tab-usage" class="tab-content">
+            <div class="summary-cards">
+                <div class="card">
+                    <div class="label">DAU峰值</div>
+                    <div class="value">657</div>
+                    <div class="sub">2026-07-22</div>
+                </div>
+                <div class="card info">
+                    <div class="label">人均使用次数</div>
+                    <div class="value">3.0</div>
+                </div>
+                <div class="card success">
+                    <div class="label">活跃天数</div>
+                    <div class="value">27</div>
+                    <div class="sub">天</div>
+                </div>
+                <div class="card">
+                    <div class="label">日均提问量</div>
+                    <div class="value">431</div>
+                    <div class="sub">条/天</div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>各时段使用量分布</h3>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <div class="bar-label">00:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:2.0%"></div></div></div>
+                        <div class="bar-count">28条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">01:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.9%"></div></div></div>
+                        <div class="bar-count">13条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">02:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:1.1%"></div></div></div>
+                        <div class="bar-count">16条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">03:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.5%"></div></div></div>
+                        <div class="bar-count">7条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">04:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.2%"></div></div></div>
+                        <div class="bar-count">3条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">05:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.2%"></div></div></div>
+                        <div class="bar-count">3条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">06:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.3%"></div></div></div>
+                        <div class="bar-count">4条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">07:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:2.1%"></div></div></div>
+                        <div class="bar-count">30条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">08:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:56.9%"></div></div></div>
+                        <div class="bar-count">814条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">09:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:92.0%"></div></div></div>
+                        <div class="bar-count">1316条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">10:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:100.0%"></div></div></div>
+                        <div class="bar-count">1431条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">11:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:72.9%"></div></div></div>
+                        <div class="bar-count">1043条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">12:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:8.4%"></div></div></div>
+                        <div class="bar-count">120条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">13:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:58.9%"></div></div></div>
+                        <div class="bar-count">843条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">14:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:82.1%"></div></div></div>
+                        <div class="bar-count">1175条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">15:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:84.3%"></div></div></div>
+                        <div class="bar-count">1207条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">16:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:87.8%"></div></div></div>
+                        <div class="bar-count">1257条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">17:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:85.5%"></div></div></div>
+                        <div class="bar-count">1224条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">18:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:29.4%"></div></div></div>
+                        <div class="bar-count">421条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">19:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:12.5%"></div></div></div>
+                        <div class="bar-count">179条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">20:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:11.9%"></div></div></div>
+                        <div class="bar-count">171条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">21:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:11.1%"></div></div></div>
+                        <div class="bar-count">159条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">22:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:6.3%"></div></div></div>
+                        <div class="bar-count">90条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">23:00</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:5.7%"></div></div></div>
+                        <div class="bar-count">82条</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>每日使用量趋势</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>日期</th><th>DAU</th><th>提问量</th><th>人均次数</th></tr></thead>
+                        <tbody>
+                            <tr><td>2026-06-26</td><td class="num">2</td><td class="num">3</td><td class="num">1.5</td></tr>
+                            <tr><td>2026-06-29</td><td class="num">1</td><td class="num">4</td><td class="num">4.0</td></tr>
+                            <tr><td>2026-07-01</td><td class="num">2</td><td class="num">2</td><td class="num">1.0</td></tr>
+                            <tr><td>2026-07-02</td><td class="num">2</td><td class="num">4</td><td class="num">2.0</td></tr>
+                            <tr><td>2026-07-03</td><td class="num">12</td><td class="num">79</td><td class="num">6.6</td></tr>
+                            <tr><td>2026-07-04</td><td class="num">4</td><td class="num">107</td><td class="num">26.8</td></tr>
+                            <tr><td>2026-07-05</td><td class="num">3</td><td class="num">14</td><td class="num">4.7</td></tr>
+                            <tr><td>2026-07-06</td><td class="num">8</td><td class="num">81</td><td class="num">10.1</td></tr>
+                            <tr><td>2026-07-07</td><td class="num">20</td><td class="num">141</td><td class="num">7.0</td></tr>
+                            <tr><td>2026-07-08</td><td class="num">19</td><td class="num">134</td><td class="num">7.1</td></tr>
+                            <tr><td>2026-07-09</td><td class="num">18</td><td class="num">41</td><td class="num">2.3</td></tr>
+                            <tr><td>2026-07-10</td><td class="num">15</td><td class="num">77</td><td class="num">5.1</td></tr>
+                            <tr><td>2026-07-12</td><td class="num">1</td><td class="num">2</td><td class="num">2.0</td></tr>
+                            <tr><td>2026-07-13</td><td class="num">431</td><td class="num">747</td><td class="num">1.7</td></tr>
+                            <tr><td>2026-07-14</td><td class="num">527</td><td class="num">907</td><td class="num">1.7</td></tr>
+                            <tr><td>2026-07-15</td><td class="num">554</td><td class="num">1044</td><td class="num">1.9</td></tr>
+                            <tr><td>2026-07-16</td><td class="num">632</td><td class="num">1102</td><td class="num">1.7</td></tr>
+                            <tr><td>2026-07-17</td><td class="num">582</td><td class="num">1127</td><td class="num">1.9</td></tr>
+                            <tr><td>2026-07-18</td><td class="num">107</td><td class="num">174</td><td class="num">1.6</td></tr>
+                            <tr><td>2026-07-19</td><td class="num">59</td><td class="num">106</td><td class="num">1.8</td></tr>
+                            <tr><td>2026-07-20</td><td class="num">653</td><td class="num">1188</td><td class="num">1.8</td></tr>
+                            <tr><td>2026-07-21</td><td class="num">588</td><td class="num">1039</td><td class="num">1.8</td></tr>
+                            <tr><td>2026-07-22</td><td class="num">657</td><td class="num">1150</td><td class="num">1.8</td></tr>
+                            <tr><td>2026-07-23</td><td class="num">627</td><td class="num">1042</td><td class="num">1.7</td></tr>
+                            <tr><td>2026-07-24</td><td class="num">552</td><td class="num">947</td><td class="num">1.7</td></tr>
+                            <tr><td>2026-07-25</td><td class="num">161</td><td class="num">254</td><td class="num">1.6</td></tr>
+                            <tr><td>2026-07-26</td><td class="num">64</td><td class="num">120</td><td class="num">1.9</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户画像 -->
+        <div id="tab-user" class="tab-content">
+            <div class="section">
+                <h3>用户分层</h3>
+                <div class="three-col">
+                    <div class="card">
+                        <div class="label">一次性(1次)</div>
+                        <div class="value">1,796</div>
+                        <div class="sub">占比 45.6%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill blue" style="width:45.6%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">低频(2-5次)</div>
+                        <div class="value">1,723</div>
+                        <div class="sub">占比 43.7%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill green" style="width:43.7%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">中频(6-20次)</div>
+                        <div class="value">391</div>
+                        <div class="sub">占比 9.9%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill purple" style="width:9.9%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">高频(21次+)</div>
+                        <div class="value">31</div>
+                        <div class="sub">占比 0.8%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill orange" style="width:0.8%"></div></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>用户行为洞察</h3>
+                <div class="insight-card">
+                    <div class="title"> 重复提问</div>
+                    <div class="content">1193 位用户存在重复提问行为（同一问题问多次），占比 30.3%</div>
+                </div>
+                <div class="insight-card">
+                    <div class="title"> 流失用户</div>
+                    <div class="content">1796 位用户仅使用1次后未再回来，流失率 45.6%。建议关注新用户引导和首次体验优化。</div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>高频用户 TOP 20</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>排名</th><th>用户</th><th>使用次数</th><th>不同问题数</th><th>问题重复率</th></tr></thead>
+                        <tbody>
+                            <tr><td class="center">1</td><td>ex_guoll2</td><td class="num">204</td><td class="num">117</td><td class="num">42.6%</td></tr>
+                            <tr><td class="center">2</td><td>zhangbo279</td><td class="num">173</td><td class="num">110</td><td class="num">36.4%</td></tr>
+                            <tr><td class="center">3</td><td>xuyb5</td><td class="num">119</td><td class="num">68</td><td class="num">42.9%</td></tr>
+                            <tr><td class="center">4</td><td>ex_lihai8</td><td class="num">89</td><td class="num">75</td><td class="num">15.7%</td></tr>
+                            <tr><td class="center">5</td><td>yuanst1</td><td class="num">87</td><td class="num">65</td><td class="num">25.3%</td></tr>
+                            <tr><td class="center">6</td><td>ex_lirl9</td><td class="num">77</td><td class="num">24</td><td class="num">68.8%</td></tr>
+                            <tr><td class="center">7</td><td>zhoutw10</td><td class="num">60</td><td class="num">48</td><td class="num">20.0%</td></tr>
+                            <tr><td class="center">8</td><td>nijm4</td><td class="num">58</td><td class="num">58</td><td class="num">0.0%</td></tr>
+                            <tr><td class="center">9</td><td>tangcf15</td><td class="num">45</td><td class="num">31</td><td class="num">31.1%</td></tr>
+                            <tr><td class="center">10</td><td>ex_qiugy1</td><td class="num">43</td><td class="num">40</td><td class="num">7.0%</td></tr>
+                            <tr><td class="center">11</td><td>wanglu21</td><td class="num">40</td><td class="num">29</td><td class="num">27.5%</td></tr>
+                            <tr><td class="center">12</td><td>ex_xiedi4</td><td class="num">36</td><td class="num">36</td><td class="num">0.0%</td></tr>
+                            <tr><td class="center">13</td><td>linzh170</td><td class="num">35</td><td class="num">24</td><td class="num">31.4%</td></tr>
+                            <tr><td class="center">14</td><td>chendm61</td><td class="num">33</td><td class="num">25</td><td class="num">24.2%</td></tr>
+                            <tr><td class="center">15</td><td>lincj40</td><td class="num">32</td><td class="num">28</td><td class="num">12.5%</td></tr>
+                            <tr><td class="center">16</td><td>liuchang154</td><td class="num">31</td><td class="num">23</td><td class="num">25.8%</td></tr>
+                            <tr><td class="center">17</td><td>kerui</td><td class="num">30</td><td class="num">1</td><td class="num">96.7%</td></tr>
+                            <tr><td class="center">18</td><td>chenjd96</td><td class="num">30</td><td class="num">20</td><td class="num">33.3%</td></tr>
+                            <tr><td class="center">19</td><td>morb5</td><td class="num">27</td><td class="num">19</td><td class="num">29.6%</td></tr>
+                            <tr><td class="center">20</td><td>wangyn166</td><td class="num">26</td><td class="num">13</td><td class="num">50.0%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 问题特征 -->
+        <div id="tab-question" class="tab-content">
+            <div class="section">
+                <h3>问题长度分布</h3>
+                <div class="three-col">
+                    <div class="card">
+                        <div class="label">极简(1-2字)</div>
+                        <div class="value">2,532</div>
+                        <div class="sub">占比 21.8%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill blue" style="width:21.8%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">关键词(3-5字)</div>
+                        <div class="value">4,944</div>
+                        <div class="sub">占比 42.5%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill green" style="width:42.5%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">短语(6-10字)</div>
+                        <div class="value">2,213</div>
+                        <div class="sub">占比 19.0%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill yellow" style="width:19.0%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">短句(11-20字)</div>
+                        <div class="value">1,325</div>
+                        <div class="sub">占比 11.4%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill purple" style="width:11.4%"></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="label">复杂(21字+)</div>
+                        <div class="value">622</div>
+                        <div class="sub">占比 5.3%</div>
+                        <div style="margin-top:12px"><div class="progress-bar"><div class="progress-fill orange" style="width:5.3%"></div></div></div>
+                    </div>
+                </div>
+                <div class="insight-card" style="margin-top:16px">
+                    <div class="title">💡 提问习惯</div>
+                    <div class="content">64.2% 的问题在5个字以内，用户倾向于用关键词搜索。建议优化关键词匹配和智能联想功能。</div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>高频问题 TOP 30</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>排名</th><th>问题</th><th>次数</th><th>占比</th></tr></thead>
+                        <tbody>
+                            <tr><td class="center">1</td><td>智能体</td><td class="num">243</td><td class="num">2.1%</td></tr>
+                            <tr><td class="center">2</td><td>creo</td><td class="num">136</td><td class="num">1.2%</td></tr>
+                            <tr><td class="center">3</td><td>我想提升AI应用能力，可以学什么</td><td class="num">112</td><td class="num">1.0%</td></tr>
+                            <tr><td class="center">4</td><td>小龙虾</td><td class="num">105</td><td class="num">0.9%</td></tr>
+                            <tr><td class="center">5</td><td>UG</td><td class="num">103</td><td class="num">0.9%</td></tr>
+                            <tr><td class="center">6</td><td>AI</td><td class="num">94</td><td class="num">0.8%</td></tr>
+                            <tr><td class="center">7</td><td>ug</td><td class="num">92</td><td class="num">0.8%</td></tr>
+                            <tr><td class="center">8</td><td>数字化</td><td class="num">76</td><td class="num">0.7%</td></tr>
+                            <tr><td class="center">9</td><td>冰箱</td><td class="num">73</td><td class="num">0.6%</td></tr>
+                            <tr><td class="center">10</td><td>skill</td><td class="num">64</td><td class="num">0.6%</td></tr>
+                            <tr><td class="center">11</td><td>AIGC</td><td class="num">63</td><td class="num">0.5%</td></tr>
+                            <tr><td class="center">12</td><td>workspace</td><td class="num">59</td><td class="num">0.5%</td></tr>
+                            <tr><td class="center">13</td><td>智能体认证</td><td class="num">58</td><td class="num">0.5%</td></tr>
+                            <tr><td class="center">14</td><td>PLM</td><td class="num">54</td><td class="num">0.5%</td></tr>
+                            <tr><td class="center">15</td><td>信息安全</td><td class="num">52</td><td class="num">0.4%</td></tr>
+                            <tr><td class="center">16</td><td>龙虾</td><td class="num">51</td><td class="num">0.4%</td></tr>
+                            <tr><td class="center">17</td><td>EHS</td><td class="num">45</td><td class="num">0.4%</td></tr>
+                            <tr><td class="center">18</td><td>认证</td><td class="num">44</td><td class="num">0.4%</td></tr>
+                            <tr><td class="center">19</td><td>电机</td><td class="num">44</td><td class="num">0.4%</td></tr>
+                            <tr><td class="center">20</td><td>接待</td><td class="num">43</td><td class="num">0.4%</td></tr>
+                            <tr><td class="center">21</td><td>推荐5门AIGC课程</td><td class="num">40</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">22</td><td>供应链</td><td class="num">40</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">23</td><td>dify</td><td class="num">38</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">24</td><td>物流</td><td class="num">35</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">25</td><td>工艺</td><td class="num">35</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">26</td><td>ai</td><td class="num">33</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">27</td><td>压缩机</td><td class="num">33</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">28</td><td>MBS</td><td class="num">33</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">29</td><td>库卡</td><td class="num">33</td><td class="num">0.3%</td></tr>
+                            <tr><td class="center">30</td><td>智能体人才认证</td><td class="num">32</td><td class="num">0.3%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="section">
+                <h3>热词云</h3>
+                <div style="padding:16px">
+                    <span class="hot-tag" style="font-size:28px;color:#1e3a5f;background:#1e3a5f15">ai (969)</span>
+                    <span class="hot-tag" style="font-size:25.374613003095973px;color:#2c5282;background:#2c528215">课程 (810)</span>
+                    <span class="hot-tag" style="font-size:20.23942208462332px;color:#28a745;background:#28a74515">智能体 (499)</span>
+                    <span class="hot-tag" style="font-size:19.49638802889577px;color:#7c3aed;background:#7c3aed15">培训 (454)</span>
+                    <span class="hot-tag" style="font-size:18.852425180598555px;color:#ea580c;background:#ea580c15">学习 (415)</span>
+                    <span class="hot-tag" style="font-size:18.42311661506708px;color:#db2777;background:#db277715">管理 (389)</span>
+                    <span class="hot-tag" style="font-size:16.821465428276575px;color:#0d9488;background:#0d948815">产品 (292)</span>
+                    <span class="hot-tag" style="font-size:15.88028895768834px;color:#1e3a5f;background:#1e3a5f15">aigc (235)</span>
+                    <span class="hot-tag" style="font-size:15.748194014447884px;color:#2c5282;background:#2c528215">龙虾 (227)</span>
+                    <span class="hot-tag" style="font-size:14.873065015479876px;color:#28a745;background:#28a74515">数据 (174)</span>
+                    <span class="hot-tag" style="font-size:14.608875128998967px;color:#7c3aed;background:#7c3aed15">小龙虾 (158)</span>
+                    <span class="hot-tag" style="font-size:14.29514963880289px;color:#ea580c;background:#ea580c15">考试 (139)</span>
+                    <span class="hot-tag" style="font-size:13.931888544891642px;color:#db2777;background:#db277715">系统 (117)</span>
+                    <span class="hot-tag" style="font-size:13.618163054695563px;color:#0d9488;background:#0d948815">hr (98)</span>
+                    <span class="hot-tag" style="font-size:13.2218782249742px;color:#1e3a5f;background:#1e3a5f15">物流 (74)</span>
+                    <span class="hot-tag" style="font-size:13.17234262125903px;color:#2c5282;background:#2c528215">流程 (71)</span>
+                    <span class="hot-tag" style="font-size:13.155830753353973px;color:#28a745;background:#28a74515">入职 (70)</span>
+                    <span class="hot-tag" style="font-size:13.155830753353973px;color:#7c3aed;background:#7c3aed15">战略 (70)</span>
+                    <span class="hot-tag" style="font-size:12.941176470588236px;color:#ea580c;background:#ea580c15">excel (57)</span>
+                    <span class="hot-tag" style="font-size:12.924664602683178px;color:#db2777;background:#db277715">agent (56)</span>
+                    <span class="hot-tag" style="font-size:12.842105263157894px;color:#0d9488;background:#0d948815">openclaw (51)</span>
+                    <span class="hot-tag" style="font-size:12.71001031991744px;color:#1e3a5f;background:#1e3a5f15">文化 (43)</span>
+                    <span class="hot-tag" style="font-size:12.693498452012385px;color:#2c5282;background:#2c528215">订单 (42)</span>
+                    <span class="hot-tag" style="font-size:12.676986584107327px;color:#28a745;background:#28a74515">bi (41)</span>
+                    <span class="hot-tag" style="font-size:12.627450980392156px;color:#7c3aed;background:#7c3aed15">功能 (38)</span>
+                    <span class="hot-tag" style="font-size:12.6109391124871px;color:#ea580c;background:#ea580c15">平台 (37)</span>
+                    <span class="hot-tag" style="font-size:12.577915376676987px;color:#db2777;background:#db277715">ihr (35)</span>
+                    <span class="hot-tag" style="font-size:12.495356037151703px;color:#0d9488;background:#0d948815">组织 (30)</span>
+                    <span class="hot-tag" style="font-size:12.445820433436532px;color:#1e3a5f;background:#1e3a5f15">python (27)</span>
+                    <span class="hot-tag" style="font-size:12.429308565531477px;color:#2c5282;background:#2c528215">人力 (26)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主题分析 -->
+        <div id="tab-topic" class="tab-content">
+            <div class="section">
+                <h3>主题分布</h3>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <div class="bar-label">其他</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill red" style="width:100.0%"></div></div></div>
+                        <div class="bar-count">7620条 (65.5%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">AI/智能体</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:23.6%"></div></div></div>
+                        <div class="bar-count">1800条 (15.5%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">课程学习</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:13.0%"></div></div></div>
+                        <div class="bar-count">987条 (8.5%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">管理/文化</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill yellow" style="width:4.9%"></div></div></div>
+                        <div class="bar-count">371条 (3.2%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">业务/产品</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:4.4%"></div></div></div>
+                        <div class="bar-count">333条 (2.9%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">技术/工具</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill teal" style="width:2.8%"></div></div></div>
+                        <div class="bar-count">212条 (1.8%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">系统/平台</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill purple" style="width:2.2%"></div></div></div>
+                        <div class="bar-count">171条 (1.5%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">HR/人事</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill pink" style="width:1.9%"></div></div></div>
+                        <div class="bar-count">142条 (1.2%)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>各主题高频问题</h3>
+                <div style="margin-bottom:16px">
+                    <h4 style="color:#1e3a5f;margin-bottom:8px;font-size:14px">其他 TOP 5</h4>
+                    <table style="font-size:12px">
+                        <thead><tr><th>问题</th><th>次数</th></tr></thead>
+                        <tbody>
+                            <tr><td>creo</td><td class="num">136</td></tr>
+                            <tr><td>UG</td><td class="num">103</td></tr>
+                            <tr><td>ug</td><td class="num">92</td></tr>
+                            <tr><td>数字化</td><td class="num">76</td></tr>
+                            <tr><td>冰箱</td><td class="num">73</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-bottom:16px">
+                    <h4 style="color:#1e3a5f;margin-bottom:8px;font-size:14px">AI/智能体 TOP 5</h4>
+                    <table style="font-size:12px">
+                        <thead><tr><th>问题</th><th>次数</th></tr></thead>
+                        <tbody>
+                            <tr><td>智能体</td><td class="num">243</td></tr>
+                            <tr><td>我想提升AI应用能力，可以学什么</td><td class="num">112</td></tr>
+                            <tr><td>小龙虾</td><td class="num">105</td></tr>
+                            <tr><td>AI</td><td class="num">94</td></tr>
+                            <tr><td>AIGC</td><td class="num">63</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-bottom:16px">
+                    <h4 style="color:#1e3a5f;margin-bottom:8px;font-size:14px">课程学习 TOP 5</h4>
+                    <table style="font-size:12px">
+                        <thead><tr><th>问题</th><th>次数</th></tr></thead>
+                        <tbody>
+                            <tr><td>考试</td><td class="num">30</td></tr>
+                            <tr><td>课程</td><td class="num">29</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-bottom:16px">
+                    <h4 style="color:#1e3a5f;margin-bottom:8px;font-size:14px">管理/文化 TOP 5</h4>
+                    <table style="font-size:12px">
+                        <thead><tr><th>问题</th><th>次数</th></tr></thead>
+                        <tbody>
+                            <tr><td>项目管理</td><td class="num">29</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-bottom:16px">
+                    <h4 style="color:#1e3a5f;margin-bottom:8px;font-size:14px">业务/产品 TOP 5</h4>
+                    <table style="font-size:12px">
+                        <thead><tr><th>问题</th><th>次数</th></tr></thead>
+                        <tbody>
+                            <tr><td>物流</td><td class="num">35</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 部门分析 -->
+        <div id="tab-dept" class="tab-content">
+            <div class="section">
+                <h3>部门大类分布</h3>
+                <div class="dept-grid">
+                    <div class="dept-card" style="border-left:4px solid #2c5282">
+                        <div class="dept-name">智能家居事业群</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">5578条 (47.9%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">1946人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">2.9次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">140人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">56.3秒</span></div>
+                    </div>
+                    <div class="dept-card" style="border-left:4px solid #7c3aed">
+                        <div class="dept-name">集团职能</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">780条 (6.7%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">197人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">4.0次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">16人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">53.6秒</span></div>
+                    </div>
+                    <div class="dept-card" style="border-left:4px solid #0d9488">
+                        <div class="dept-name">专业平台</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">1111条 (9.5%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">312人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">3.6次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">20人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">51.3秒</span></div>
+                    </div>
+                    <div class="dept-card" style="border-left:4px solid #ea580c">
+                        <div class="dept-name">其他单位</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">3367条 (28.9%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">1198人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">2.8次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">129人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">56.1秒</span></div>
+                    </div>
+                    <div class="dept-card" style="border-left:4px solid #db2777">
+                        <div class="dept-name">自主业务</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">400条 (3.4%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">147人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">2.7次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">16人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">54.9秒</span></div>
+                    </div>
+                    <div class="dept-card" style="border-left:4px solid #6b7280">
+                        <div class="dept-name">关联单位</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">373条 (3.2%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">131人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">2.8次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">13人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">56.9秒</span></div>
+                    </div>
+                    <div class="dept-card" style="border-left:4px solid #9ca3af">
+                        <div class="dept-name">未知</div>
+                        <div class="dept-stat"><span>提问量</span><span class="val">27条 (0.2%)</span></div>
+                        <div class="dept-stat"><span>用户数</span><span class="val">10人</span></div>
+                        <div class="dept-stat"><span>人均提问</span><span class="val">2.7次</span></div>
+                        <div class="dept-stat"><span>日均活跃</span><span class="val">1人</span></div>
+                        <div class="dept-stat"><span>平均响应</span><span class="val">43.6秒</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>部门 × 主题交叉分析</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>部门</th><th>其他</th><th>AI/智能体</th><th>课程学习</th><th>管理/文化</th><th>业务/产品</th><th>技术/工具</th><th>系统/平台</th><th>HR/人事</th><th>合计</th></tr></thead><tbody><tr><td><strong>智能家居事业群</strong></td><td class="num">3654 (66%)</td><td class="num">867 (16%)</td><td class="num">473 (8%)</td><td class="num">167 (3%)</td><td class="num">165 (3%)</td><td class="num">82 (1%)</td><td class="num">87 (2%)</td><td class="num">83 (1%)</td><td class="num"><strong>5578</strong></td></tr><tr><td><strong>集团职能</strong></td><td class="num">428 (55%)</td><td class="num">146 (19%)</td><td class="num">130 (17%)</td><td class="num">29 (4%)</td><td class="num">11 (1%)</td><td class="num">12 (2%)</td><td class="num">4 (1%)</td><td class="num">20 (3%)</td><td class="num"><strong>780</strong></td></tr><tr><td><strong>专业平台</strong></td><td class="num">520 (47%)</td><td class="num">332 (30%)</td><td class="num">159 (14%)</td><td class="num">38 (3%)</td><td class="num">9 (1%)</td><td class="num">27 (2%)</td><td class="num">19 (2%)</td><td class="num">7 (1%)</td><td class="num"><strong>1111</strong></td></tr><tr><td><strong>其他单位</strong></td><td class="num">2554 (76%)</td><td class="num">297 (9%)</td><td class="num">164 (5%)</td><td class="num">108 (3%)</td><td class="num">120 (4%)</td><td class="num">52 (2%)</td><td class="num">44 (1%)</td><td class="num">28 (1%)</td><td class="num"><strong>3367</strong></td></tr><tr><td><strong>自主业务</strong></td><td class="num">228 (57%)</td><td class="num">97 (24%)</td><td class="num">11 (3%)</td><td class="num">16 (4%)</td><td class="num">14 (4%)</td><td class="num">23 (6%)</td><td class="num">9 (2%)</td><td class="num">2 (0%)</td><td class="num"><strong>400</strong></td></tr><tr><td><strong>关联单位</strong></td><td class="num">215 (58%)</td><td class="num">57 (15%)</td><td class="num">50 (13%)</td><td class="num">12 (3%)</td><td class="num">14 (4%)</td><td class="num">15 (4%)</td><td class="num">8 (2%)</td><td class="num">2 (1%)</td><td class="num"><strong>373</strong></td></tr>                    </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="section">
+                <h3>部门使用量排行</h3>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <div class="bar-label">智能家居事业群</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill #2c5282" style="width:100.0%"></div></div></div>
+                        <div class="bar-count">5578条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">其他单位</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill #ea580c" style="width:60.4%"></div></div></div>
+                        <div class="bar-count">3367条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">专业平台</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill #0d9488" style="width:19.9%"></div></div></div>
+                        <div class="bar-count">1111条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">集团职能</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill #7c3aed" style="width:14.0%"></div></div></div>
+                        <div class="bar-count">780条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">自主业务</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill #db2777" style="width:7.2%"></div></div></div>
+                        <div class="bar-count">400条</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">关联单位</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill #6b7280" style="width:6.7%"></div></div></div>
+                        <div class="bar-count">373条</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 职群/职种 -->
+        <div id="tab-job" class="tab-content">
+            <div class="two-col">
+                <div class="section">
+                    <h3>职群分布</h3>
+                    <div class="bar-chart">
+                        <div class="bar-row">
+                            <div class="bar-label">信息技术</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:100.0%"></div></div></div>
+                            <div class="bar-count">2164条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">毕业生</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:99.8%"></div></div></div>
+                            <div class="bar-count">2160条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">研发</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:84.6%"></div></div></div>
+                            <div class="bar-count">1831条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">生产制造</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:54.6%"></div></div></div>
+                            <div class="bar-count">1182条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">人力资源</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:41.3%"></div></div></div>
+                            <div class="bar-count">893条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">物流</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:31.6%"></div></div></div>
+                            <div class="bar-count">684条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">销售</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:29.9%"></div></div></div>
+                            <div class="bar-count">648条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">品质</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:28.6%"></div></div></div>
+                            <div class="bar-count">619条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">财经</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:24.0%"></div></div></div>
+                            <div class="bar-count">519条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">供应链</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:20.9%"></div></div></div>
+                            <div class="bar-count">453条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">服务</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:7.9%"></div></div></div>
+                            <div class="bar-count">171条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">运营</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:5.3%"></div></div></div>
+                            <div class="bar-count">114条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">营销</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:5.0%"></div></div></div>
+                            <div class="bar-count">109条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">法务</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.9%"></div></div></div>
+                            <div class="bar-count">19条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">审计</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:0.8%"></div></div></div>
+                            <div class="bar-count">18条</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>职种分布</h3>
+                    <div class="bar-chart">
+                        <div class="bar-row">
+                            <div class="bar-label">实习生</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:100.0%"></div></div></div>
+                            <div class="bar-count">2016条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">产品开发</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:64.4%"></div></div></div>
+                            <div class="bar-count">1299条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">开发</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:28.6%"></div></div></div>
+                            <div class="bar-count">577条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">产品</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:27.0%"></div></div></div>
+                            <div class="bar-count">544条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">工艺</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:23.3%"></div></div></div>
+                            <div class="bar-count">470条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">HRBP</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:22.4%"></div></div></div>
+                            <div class="bar-count">451条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">测试</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:19.9%"></div></div></div>
+                            <div class="bar-count">402条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">先行研究</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:18.1%"></div></div></div>
+                            <div class="bar-count">364条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">计划运营</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:15.3%"></div></div></div>
+                            <div class="bar-count">309条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">算法</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:15.1%"></div></div></div>
+                            <div class="bar-count">305条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">研发品质</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:12.6%"></div></div></div>
+                            <div class="bar-count">255条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">仓储物流</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:11.8%"></div></div></div>
+                            <div class="bar-count">238条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">操作工</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:10.2%"></div></div></div>
+                            <div class="bar-count">206条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">会计管理</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:9.9%"></div></div></div>
+                            <div class="bar-count">200条</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label">培训与学习发展</div>
+                            <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:9.2%"></div></div></div>
+                            <div class="bar-count">185条</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>职群 × 主题交叉</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>职群</th><th>其他</th><th>AI/智能体</th><th>课程学习</th><th>管理/文化</th><th>业务/产品</th><th>技术/工具</th><th>系统/平台</th><th>HR/人事</th><th>合计</th></tr></thead><tbody><tr><td><strong>信息技术</strong></td><td class="num">1029 (48%)</td><td class="num">533 (25%)</td><td class="num">402 (19%)</td><td class="num">59 (3%)</td><td class="num">31 (1%)</td><td class="num">63 (3%)</td><td class="num">34 (2%)</td><td class="num">13 (1%)</td><td class="num"><strong>2164</strong></td></tr><tr><td><strong>毕业生</strong></td><td class="num">1560 (72%)</td><td class="num">227 (11%)</td><td class="num">93 (4%)</td><td class="num">60 (3%)</td><td class="num">97 (4%)</td><td class="num">63 (3%)</td><td class="num">37 (2%)</td><td class="num">23 (1%)</td><td class="num"><strong>2160</strong></td></tr><tr><td><strong>研发</strong></td><td class="num">1483 (81%)</td><td class="num">160 (9%)</td><td class="num">83 (5%)</td><td class="num">29 (2%)</td><td class="num">38 (2%)</td><td class="num">12 (1%)</td><td class="num">19 (1%)</td><td class="num">7 (0%)</td><td class="num"><strong>1831</strong></td></tr><tr><td><strong>生产制造</strong></td><td class="num">847 (72%)</td><td class="num">134 (11%)</td><td class="num">104 (9%)</td><td class="num">43 (4%)</td><td class="num">14 (1%)</td><td class="num">15 (1%)</td><td class="num">23 (2%)</td><td class="num">2 (0%)</td><td class="num"><strong>1182</strong></td></tr><tr><td><strong>人力资源</strong></td><td class="num">435 (49%)</td><td class="num">163 (18%)</td><td class="num">124 (14%)</td><td class="num">74 (8%)</td><td class="num">31 (3%)</td><td class="num">5 (1%)</td><td class="num">3 (0%)</td><td class="num">58 (6%)</td><td class="num"><strong>893</strong></td></tr><tr><td><strong>物流</strong></td><td class="num">458 (67%)</td><td class="num">56 (8%)</td><td class="num">40 (6%)</td><td class="num">37 (5%)</td><td class="num">54 (8%)</td><td class="num">8 (1%)</td><td class="num">22 (3%)</td><td class="num">9 (1%)</td><td class="num"><strong>684</strong></td></tr><tr><td><strong>销售</strong></td><td class="num">444 (69%)</td><td class="num">101 (16%)</td><td class="num">28 (4%)</td><td class="num">11 (2%)</td><td class="num">27 (4%)</td><td class="num">19 (3%)</td><td class="num">16 (2%)</td><td class="num">2 (0%)</td><td class="num"><strong>648</strong></td></tr><tr><td><strong>品质</strong></td><td class="num">422 (68%)</td><td class="num">99 (16%)</td><td class="num">54 (9%)</td><td class="num">12 (2%)</td><td class="num">11 (2%)</td><td class="num">8 (1%)</td><td class="num">7 (1%)</td><td class="num">6 (1%)</td><td class="num"><strong>619</strong></td></tr><tr><td><strong>财经</strong></td><td class="num">369 (71%)</td><td class="num">95 (18%)</td><td class="num">13 (3%)</td><td class="num">15 (3%)</td><td class="num">10 (2%)</td><td class="num">6 (1%)</td><td class="num">2 (0%)</td><td class="num">9 (2%)</td><td class="num"><strong>519</strong></td></tr><tr><td><strong>供应链</strong></td><td class="num">257 (57%)</td><td class="num">124 (27%)</td><td class="num">27 (6%)</td><td class="num">14 (3%)</td><td class="num">16 (4%)</td><td class="num">10 (2%)</td><td class="num">3 (1%)</td><td class="num">2 (0%)</td><td class="num"><strong>453</strong></td></tr>                    </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="section">
+                <h3>职种 × 主题交叉</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>职种</th><th>其他</th><th>AI/智能体</th><th>课程学习</th><th>管理/文化</th><th>业务/产品</th><th>技术/工具</th><th>系统/平台</th><th>HR/人事</th><th>合计</th></tr></thead><tbody><tr><td><strong>实习生</strong></td><td class="num">1499 (74%)</td><td class="num">223 (11%)</td><td class="num">76 (4%)</td><td class="num">44 (2%)</td><td class="num">73 (4%)</td><td class="num">54 (3%)</td><td class="num">28 (1%)</td><td class="num">19 (1%)</td><td class="num"><strong>2016</strong></td></tr><tr><td><strong>产品开发</strong></td><td class="num">1078 (83%)</td><td class="num">89 (7%)</td><td class="num">59 (5%)</td><td class="num">19 (1%)</td><td class="num">29 (2%)</td><td class="num">6 (0%)</td><td class="num">16 (1%)</td><td class="num">3 (0%)</td><td class="num"><strong>1299</strong></td></tr><tr><td><strong>开发</strong></td><td class="num">281 (49%)</td><td class="num">147 (25%)</td><td class="num">93 (16%)</td><td class="num">15 (3%)</td><td class="num">9 (2%)</td><td class="num">20 (3%)</td><td class="num">8 (1%)</td><td class="num">4 (1%)</td><td class="num"><strong>577</strong></td></tr><tr><td><strong>产品</strong></td><td class="num">282 (52%)</td><td class="num">122 (22%)</td><td class="num">62 (11%)</td><td class="num">31 (6%)</td><td class="num">16 (3%)</td><td class="num">15 (3%)</td><td class="num">11 (2%)</td><td class="num">5 (1%)</td><td class="num"><strong>544</strong></td></tr><tr><td><strong>工艺</strong></td><td class="num">374 (80%)</td><td class="num">38 (8%)</td><td class="num">25 (5%)</td><td class="num">8 (2%)</td><td class="num">7 (1%)</td><td class="num">10 (2%)</td><td class="num">7 (1%)</td><td class="num">1 (0%)</td><td class="num"><strong>470</strong></td></tr><tr><td><strong>HRBP</strong></td><td class="num">200 (44%)</td><td class="num">90 (20%)</td><td class="num">74 (16%)</td><td class="num">35 (8%)</td><td class="num">19 (4%)</td><td class="num">1 (0%)</td><td class="num">2 (0%)</td><td class="num">30 (7%)</td><td class="num"><strong>451</strong></td></tr><tr><td><strong>测试</strong></td><td class="num">158 (39%)</td><td class="num">69 (17%)</td><td class="num">167 (42%)</td><td class="num">3 (1%)</td><td class="num">1 (0%)</td><td class="num">1 (0%)</td><td class="num">1 (0%)</td><td class="num">2 (0%)</td><td class="num"><strong>402</strong></td></tr><tr><td><strong>先行研究</strong></td><td class="num">296 (81%)</td><td class="num">40 (11%)</td><td class="num">13 (4%)</td><td class="num">1 (0%)</td><td class="num">2 (1%)</td><td class="num">5 (1%)</td><td class="num">3 (1%)</td><td class="num">4 (1%)</td><td class="num"><strong>364</strong></td></tr><tr><td><strong>计划运营</strong></td><td class="num">159 (51%)</td><td class="num">104 (34%)</td><td class="num">15 (5%)</td><td class="num">7 (2%)</td><td class="num">15 (5%)</td><td class="num">7 (2%)</td><td class="num">0 (0%)</td><td class="num">2 (1%)</td><td class="num"><strong>309</strong></td></tr><tr><td><strong>算法</strong></td><td class="num">114 (37%)</td><td class="num">126 (41%)</td><td class="num">56 (18%)</td><td class="num">1 (0%)</td><td class="num">0 (0%)</td><td class="num">3 (1%)</td><td class="num">4 (1%)</td><td class="num">1 (0%)</td><td class="num"><strong>305</strong></td></tr>                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 响应质量 -->
+        <div id="tab-quality" class="tab-content">
+            <div class="summary-cards">
+                <div class="card">
+                    <div class="label">平均响应时间</div>
+                    <div class="value">55.5s</div>
+                </div>
+                <div class="card info">
+                    <div class="label">最长响应</div>
+                    <div class="value">400s</div>
+                </div>
+                <div class="card success">
+                    <div class="label">30秒内完成</div>
+                    <div class="value">14.0%</div>
+                </div>
+                <div class="card warning">
+                    <div class="label">超2分钟</div>
+                    <div class="value">80</div>
+                    <div class="sub">条</div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>响应时间分布</h3>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <div class="bar-label"><10s</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:23.6%"></div></div></div>
+                        <div class="bar-count">1201条 (10.3%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">10-30s</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:8.3%"></div></div></div>
+                        <div class="bar-count">424条 (3.6%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">30-60s</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill yellow" style="width:100.0%"></div></div></div>
+                        <div class="bar-count">5085条 (43.7%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">60-120s</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill orange" style="width:95.3%"></div></div></div>
+                        <div class="bar-count">4844条 (41.6%)</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">120s+</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill red" style="width:1.6%"></div></div></div>
+                        <div class="bar-count">80条 (0.7%)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>各部门平均响应时间</h3>
+                <div class="bar-chart">
+                    <div class="bar-row">
+                        <div class="bar-label">智能家居事业群</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:99.0%"></div></div></div>
+                        <div class="bar-count">56.3秒</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">集团职能</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:94.2%"></div></div></div>
+                        <div class="bar-count">53.6秒</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">专业平台</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:90.2%"></div></div></div>
+                        <div class="bar-count">51.3秒</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">其他单位</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:98.6%"></div></div></div>
+                        <div class="bar-count">56.1秒</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">自主业务</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:96.5%"></div></div></div>
+                        <div class="bar-count">54.9秒</div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">关联单位</div>
+                        <div class="bar-wrap"><div class="progress-bar"><div class="progress-fill blue" style="width:100.0%"></div></div></div>
+                        <div class="bar-count">56.9秒</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        美课AI搜索 · 问答日志分析报告 · 自动生成
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
