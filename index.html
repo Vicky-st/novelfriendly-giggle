@@ -408,6 +408,199 @@
             .graph-container { flex-direction: column; }
             .info-panel { width: 100%; max-height: none; }
         }
+        
+        /* 性格测试样式 */
+        .quiz-page {
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .quiz-container {
+            max-width: 600px;
+            width: 100%;
+        }
+        .quiz-container h1 {
+            font-size: 32px;
+            color: #f5c518;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .quiz-subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .quiz-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f5c518, #ff6b6b);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .quiz-question {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .quiz-question h3 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .quiz-options {
+            display: grid;
+            gap: 12px;
+        }
+        .quiz-option {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 15px;
+        }
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #f5c518;
+            color: #fff;
+        }
+        .quiz-option.selected {
+            background: rgba(245, 197, 24, 0.2);
+            border-color: #f5c518;
+            color: #f5c518;
+        }
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .quiz-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quiz-btn.prev {
+            background: rgba(255,255,255,0.1);
+            color: #888;
+        }
+        .quiz-btn.prev:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .quiz-btn.next {
+            background: linear-gradient(135deg, #f5c518, #ff6b6b);
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        .quiz-btn.next:hover {
+            transform: scale(1.05);
+        }
+        .quiz-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 结果页样式 */
+        .result-page {
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .result-container {
+            max-width: 500px;
+            width: 100%;
+        }
+        .result-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .result-emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .result-character {
+            font-size: 32px;
+            color: #f5c518;
+            margin-bottom: 10px;
+        }
+        .result-book {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .result-desc {
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .result-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .trait-tag {
+            background: rgba(245, 197, 24, 0.2);
+            color: #f5c518;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        .result-quote {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid #f5c518;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .result-quote p {
+            color: #ccc;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .result-quote cite {
+            color: #888;
+            font-size: 13px;
+        }
+        .share-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .share-btn:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -445,6 +638,41 @@
             <div class="book-card" data-book="战争与和平">
                 <div class="book-name">战争与和平</div>
                 <div class="book-author">列夫·托尔斯泰</div>
+            </div>
+        </div>
+        
+        <p class="recommend-title" style="margin-top: 50px;">🎮 趣味互动</p>
+        <div class="book-grid">
+            <div class="book-card" onclick="startQuiz()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="book-name">🧠 性格测试</div>
+                <div class="book-author">你是哪个名著人物？</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 性格测试页 -->
+    <div class="quiz-page" id="quizPage" style="display: none;">
+        <div class="quiz-container">
+            <button class="back-btn" onclick="goHomeFromQuiz()">← 返回</button>
+            <h1>🧠 你是哪个名著人物？</h1>
+            <p class="quiz-subtitle">回答6个问题，发现你的文学人格</p>
+            
+            <div class="quiz-progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="quiz-content" id="quizContent">
+                <!-- 问题将通过 JS 动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 测试结果页 -->
+    <div class="result-page" id="resultPage" style="display: none;">
+        <div class="result-container">
+            <button class="back-btn" onclick="restartQuiz()">🔄 重新测试</button>
+            <div class="result-card" id="resultCard">
+                <!-- 结果将通过 JS 动态生成 -->
             </div>
         </div>
     </div>
@@ -1123,6 +1351,248 @@
                 document.getElementById('charDetail').classList.remove('active');
             }
         });
+        
+        // ========== 性格测试功能 ==========
+        const quizQuestions = [
+            {
+                q: "面对困难时，你通常会？",
+                options: [
+                    { text: "A. 想尽一切办法克服，绝不认输", type: "scarlett" },
+                    { text: "B. 冷静分析，寻找最佳解决方案", type: "andrei" },
+                    { text: "C. 坚持自己的原则，哪怕孤独", type: "jane" },
+                    { text: "D. 随遇而安，相信一切都会好起来", type: "pierre" }
+                ]
+            },
+            {
+                q: "在感情中，你最看重什么？",
+                options: [
+                    { text: "A. 激情和浪漫，要轰轰烈烈", type: "scarlett" },
+                    { text: "B. 灵魂契合，要找到真正的知己", type: "jane" },
+                    { text: "C. 默默守护，不求回报", type: "melanie" },
+                    { text: "D. 自由空间，不要束缚彼此", type: "rhett" }
+                ]
+            },
+            {
+                q: "你的社交风格是？",
+                options: [
+                    { text: "A. 热情开朗，喜欢成为焦点", type: "scarlett" },
+                    { text: "B. 温和友善，关心身边每个人", type: "melanie" },
+                    { text: "C. 深沉内敛，只和少数人深交", type: "andrei" },
+                    { text: "D. 真诚直率，讨厌虚伪", type: "jane" }
+                ]
+            },
+            {
+                q: "你的人生目标是？",
+                options: [
+                    { text: "A. 获得成功和财富，证明自己", type: "scarlett" },
+                    { text: "B. 寻找生命的意义和真理", type: "pierre" },
+                    { text: "C. 守护家人和爱人", type: "melanie" },
+                    { text: "D. 追求自由和独立", type: "jane" }
+                ]
+            },
+            {
+                q: "面对不公，你会怎么做？",
+                options: [
+                    { text: "A. 直接反抗，绝不妥协", type: "jane" },
+                    { text: "B. 用智慧和策略反击", type: "scarlett" },
+                    { text: "C. 默默承受，相信时间会证明一切", type: "melanie" },
+                    { text: "D. 反思自己，寻找问题的根源", type: "andrei" }
+                ]
+            },
+            {
+                q: "你更享受哪种生活方式？",
+                options: [
+                    { text: "A. 热闹繁华，充满社交和派对", type: "scarlett" },
+                    { text: "B. 宁静田园，与自然为伴", type: "pierre" },
+                    { text: "C. 书香相伴，精神世界丰富", type: "jane" },
+                    { text: "D. 冒险刺激，不断探索未知", type: "rhett" }
+                ]
+            }
+        ];
+        
+        const characterResults = {
+            scarlett: {
+                name: "斯嘉丽·奥哈拉",
+                book: "《飘》",
+                emoji: "🌹",
+                desc: "你是天生的领导者！像斯嘉丽一样，你有着强大的意志力和不屈不挠的精神。面对困难，你从不轻言放弃，总能找到生存之道。你的魅力让人无法抗拒，但有时候也要学会放下坚强，接受他人的帮助。",
+                traits: ["坚韧不拔", "魅力四射", "务实果断", "永不言败"],
+                quote: "Tomorrow is another day.",
+                quoteFrom: "— 斯嘉丽·奥哈拉"
+            },
+            andrei: {
+                name: "安德烈公爵",
+                book: "《战争与和平》",
+                emoji: "⚔️",
+                desc: "你是深沉的思考者！像安德烈一样，你追求生命的意义，不满足于表面的繁华。你有着敏锐的洞察力和高尚的理想，但有时候会过于理想化。学会珍惜身边的人，幸福就在当下。",
+                traits: ["深沉内敛", "追求理想", "洞察力强", "高贵优雅"],
+                quote: "我想要的只是内心的平静。",
+                quoteFrom: "— 安德烈·鲍尔康斯基"
+            },
+            jane: {
+                name: "简·爱",
+                book: "《简爱》",
+                emoji: "📖",
+                desc: "你是独立坚强的灵魂！像简·爱一样，你有着坚定的原则和自尊，绝不为了物质而放弃精神追求。你相信平等和真爱，即使面对困难也不妥协。你的内心比任何人都强大。",
+                traits: ["独立自主", "坚守原则", "内心强大", "追求平等"],
+                quote: "我虽然贫穷、卑微、不美、矮小，但我们的灵魂是平等的。",
+                quoteFrom: "— 简·爱"
+            },
+            melanie: {
+                name: "梅兰妮",
+                book: "《飘》",
+                emoji: "🕊️",
+                desc: "你是温暖的守护者！像梅兰妮一样，你善良、宽容、无私，总是关心他人胜过自己。你的温柔和坚韧感染着身边的每个人。你是朋友们最信赖的依靠，但也要记得照顾自己。",
+                traits: ["善良宽容", "温暖无私", "坚韧温柔", "值得信赖"],
+                quote: "我会永远在你身边。",
+                quoteFrom: "— 梅兰妮·汉密尔顿"
+            },
+            pierre: {
+                name: "皮埃尔",
+                book: "《战争与和平》",
+                emoji: "🌟",
+                desc: "你是真诚的探索者！像皮埃尔一样，你善良、真诚，一直在寻找生命的意义。你不追求世俗的成功，而是渴望理解世界的真理。你的内心丰富而深邃，是真正的智者。",
+                traits: ["真诚善良", "追求真理", "思想深邃", "随和包容"],
+                quote: "生命的意义在于爱，爱就是生命。",
+                quoteFrom: "— 皮埃尔·别祖霍夫"
+            },
+            rhett: {
+                name: "瑞德·巴特勒",
+                book: "《飘》",
+                emoji: "🎭",
+                desc: "你是自由的灵魂！像瑞德一样，你聪明、幽默、看透世事，不被世俗的规则束缚。你追求自由和真实，讨厌虚伪和做作。你的爱深沉而热烈，但也需要被珍惜。",
+                traits: ["聪明幽默", "追求自由", "看透世事", "深情热烈"],
+                quote: "我的亲爱的，我真的不在乎。",
+                quoteFrom: "— 瑞德·巴特勒"
+            }
+        };
+        
+        let currentQuestion = 0;
+        let quizAnswers = [];
+        
+        function startQuiz() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('quizPage').style.display = 'block';
+            currentQuestion = 0;
+            quizAnswers = [];
+            renderQuestion();
+        }
+        
+        function goHomeFromQuiz() {
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('homePage').style.display = 'flex';
+        }
+        
+        function renderQuestion() {
+            const q = quizQuestions[currentQuestion];
+            const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            let html = `
+                <div class="quiz-question">
+                    <h3>第 ${currentQuestion + 1} 题 / 共 ${quizQuestions.length} 题</h3>
+                    <h3>${q.q}</h3>
+                    <div class="quiz-options">
+            `;
+            
+            q.options.forEach((opt, i) => {
+                const selected = quizAnswers[currentQuestion] === i ? 'selected' : '';
+                html += `<div class="quiz-option ${selected}" onclick="selectOption(${i})">${opt.text}</div>`;
+            });
+            
+            html += `
+                    </div>
+                </div>
+                <div class="quiz-nav">
+                    <button class="quiz-btn prev" onclick="prevQuestion()" ${currentQuestion === 0 ? 'disabled style="visibility:hidden"' : ''}>← 上一题</button>
+                    <button class="quiz-btn next" onclick="nextQuestion()" ${quizAnswers[currentQuestion] === undefined ? 'disabled' : ''}>
+                        ${currentQuestion === quizQuestions.length - 1 ? '查看结果 →' : '下一题 →'}
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('quizContent').innerHTML = html;
+        }
+        
+        function selectOption(index) {
+            quizAnswers[currentQuestion] = index;
+            renderQuestion();
+        }
+        
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+        
+        function nextQuestion() {
+            if (quizAnswers[currentQuestion] === undefined) return;
+            
+            if (currentQuestion === quizQuestions.length - 1) {
+                showResult();
+            } else {
+                currentQuestion++;
+                renderQuestion();
+            }
+        }
+        
+        function showResult() {
+            // 统计各类型得分
+            const scores = {};
+            quizAnswers.forEach((ansIndex, qIndex) => {
+                const type = quizQuestions[qIndex].options[ansIndex].type;
+                scores[type] = (scores[type] || 0) + 1;
+            });
+            
+            // 找出得分最高的类型
+            let maxType = '';
+            let maxScore = 0;
+            for (let type in scores) {
+                if (scores[type] > maxScore) {
+                    maxScore = scores[type];
+                    maxType = type;
+                }
+            }
+            
+            const result = characterResults[maxType];
+            
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'block';
+            
+            document.getElementById('resultCard').innerHTML = `
+                <div class="result-emoji">${result.emoji}</div>
+                <div class="result-character">${result.name}</div>
+                <div class="result-book">出自 ${result.book}</div>
+                <div class="result-desc">${result.desc}</div>
+                <div class="result-traits">
+                    ${result.traits.map(t => `<span class="trait-tag">${t}</span>`).join('')}
+                </div>
+                <div class="result-quote">
+                    <p>"${result.quote}"</p>
+                    <cite>${result.quoteFrom}</cite>
+                </div>
+                <button class="share-btn" onclick="shareResult()">📤 分享结果</button>
+            `;
+        }
+        
+        function restartQuiz() {
+            document.getElementById('resultPage').style.display = 'none';
+            document.getElementById('homePage').style.display = 'flex';
+        }
+        
+        function shareResult() {
+            const text = document.querySelector('.result-character').textContent;
+            if (navigator.share) {
+                navigator.share({
+                    title: '我是名著人物：' + text,
+                    text: '快来测测你是哪个名著人物吧！',
+                    url: window.location.href
+                });
+            } else {
+                alert('结果已生成！可以截图分享哦~');
+            }
+        }
     </script>
 </body>
 </html>
